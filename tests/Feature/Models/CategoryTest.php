@@ -80,6 +80,7 @@ class CategoryTest extends TestCase
     {
         $category = factory(Category::class)->create();
         $category->delete();
+        $this->assertNull(Category::find($category->id));
 
         $category->restore();
         $this->assertNotNull(Category::find($category->id));
