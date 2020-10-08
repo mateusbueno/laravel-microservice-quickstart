@@ -16,7 +16,7 @@ namespace App\Models{
  *
  * @property string $id
  * @property string $name
- * @property int $is_active
+ * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -45,7 +45,7 @@ namespace App\Models{
  * @property string $id
  * @property string $name
  * @property string|null $description
- * @property int $is_active
+ * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
