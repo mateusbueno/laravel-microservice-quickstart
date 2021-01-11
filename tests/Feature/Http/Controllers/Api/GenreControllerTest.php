@@ -14,7 +14,6 @@ class GenreControllerTest extends TestCase
     public function testIndex()
     {
         $genre = factory(Genre::class)->create();
-
         $response = $this->get(route('genres.index'));
 
         $response
@@ -25,7 +24,6 @@ class GenreControllerTest extends TestCase
     public function testShow()
     {
         $genre = factory(Genre::class)->create();
-
         $response = $this->get(route('genres.show', ['genre' => $genre->id]));
 
         $response
@@ -45,7 +43,7 @@ class GenreControllerTest extends TestCase
         $this->assertInvalidationBoolean($response);
 
         $genre = factory(Genre::class)->create();
-        $response = $this->json('PUT', route('genres.update', ['genre' => $genre->id]), [], []);
+        $response = $this->json('PUT', route('genres.update', ['genre' => $genre->id]), []);
         $this->assertInvalidationRequired($response);
 
         $response = $this->json('PUT', route('genres.update', ['genre' => $genre->id]), [
@@ -91,7 +89,7 @@ class GenreControllerTest extends TestCase
     {
         $response = $this->json('POST', route('genres.store'), [
             'name' => 'test',
-            'is_active' => true
+            'is_active' => true,
         ]);
 
         $id = $response->json('id');
