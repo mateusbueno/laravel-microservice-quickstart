@@ -68,6 +68,22 @@ namespace App\Models{
 	class Category extends \Eloquent {}
 }
 
+namespace App\Models{
+/**
+ * App\Models\CastMember
+ *
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CastMember newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CastMember newQuery()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\CastMember onlyTrashed()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\CastMember query()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\CastMember withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\CastMember withoutTrashed()
+ */
+	class CastMember extends \Eloquent {}
+}
+
 namespace App{
 /**
  * App\User

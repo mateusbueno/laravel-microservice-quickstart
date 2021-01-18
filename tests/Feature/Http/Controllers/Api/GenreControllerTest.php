@@ -11,6 +11,7 @@ use Tests\Traits\TestValidations;
 class GenreControllerTest extends TestCase
 {
     use DatabaseMigrations, TestValidations, TestSaves;
+
     private $genre;
 
     protected function setUp(): void
@@ -35,28 +36,29 @@ class GenreControllerTest extends TestCase
             ->assertStatus(200)
             ->assertJson($this->genre->toArray());
     }
-    public function testInvalidationData()
+
+   /*  public function testInvalidationData()
     {
         $data = [
             'name' => '',
         ];
         $this->assertInvalidationInStoreAction($data, 'required');
-        /* $this->assertInvalidationInUpdateAction($data, 'required'); */
+        $this->assertInvalidationInUpdateAction($data, 'required');
 
         $data = [
             'name' => str_repeat('a', 256)
         ];
         $this->assertInvalidationInStoreAction($data, 'max.string', ['max' => 255]);
-        /* $this->assertInvalidationInUpdateAction($data, 'max.string', ['max' => 255]); */
+        $this->assertInvalidationInUpdateAction($data, 'max.string', ['max' => 255]);
 
         $data = [
             'is_active' => 'a'
         ];
         $this->assertInvalidationInStoreAction($data, 'boolean');
-        /* $this->assertInvalidationInUpdateAction($data, 'boolean'); */
-    }
+        $this->assertInvalidationInUpdateAction($data, 'boolean');
+    } */
 
-   /*  public function testStore()
+    public function testStore()
     {
         $data = [
             'name' => 'test',
@@ -75,13 +77,10 @@ class GenreControllerTest extends TestCase
         ];
         $this->assertStore($data, $data + ['is_active' => false]);
 
-    } */
+    }
 
     /* public function testUpdate()
     {
-        $this->genre = factory(Genre::class)->create([
-            'is_active' => false
-        ]);
         $data = [
             'name' => 'test',
             'is_active' => true
