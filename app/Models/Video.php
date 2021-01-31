@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -28,4 +29,14 @@ class Video extends Model
         'duration' => 'integer'
     ];
     public $incrementing = false;
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class);
+    }
 }

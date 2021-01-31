@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
 use App\Models\Video;
+use Illuminate\Http\Request;
 
 class VideoController extends BaseController
 {
@@ -18,7 +18,43 @@ class VideoController extends BaseController
             'opened' => 'boolean',
             'rating' => 'required|in:' . implode(',', Video::RATING_LIST),
             'duration' => 'required|integer',
+            'categories_id' => 'required|array|exists:categories,id,deleted_at,NULL',
+            'genres_id' => 'required|array|exists:genres,id,deleted_at,NULL'
         ];
+    }
+
+    public function store(Request $request)
+    {
+        $self = $this;
+        $validateData = $this->validate($request, $this->rulesStore());
+        /**@var Video $obj */
+        $obj = \DB::transaction(function () use($request, $validateData, $self){
+            $obj = $this->model()::create($validateData);
+            $self->handleRelations($obj, $request);
+            return $obj;
+        });
+        $obj->refresh();
+        return $obj;
+    }
+
+    public function update(Request $request, $id)
+    {
+        $self = $this;
+        $obj = $this->findOrFail($id);
+        $validatedData = $this->validate($request, $this->rulesUpdate());
+        $obj = \DB::transaction(function () use($request, $validatedData, $self, $obj){
+            $obj->update($validatedData);
+            $self->handleRelations($obj, $request);
+            return $obj;
+        });
+
+        return $obj;
+    }
+
+    protected function handleRelations($video, Request $request)
+    {
+        $video->categories()->sync($request->get('categories_id'));
+        $video->genres()->sync($request->get('genres_id'));
     }
 
     protected function model()
