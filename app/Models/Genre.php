@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -16,4 +17,10 @@ class Genre extends Model
         'is_active' => 'boolean'
     ];
     public $incrementing = false;
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
 }

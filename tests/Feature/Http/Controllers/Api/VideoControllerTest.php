@@ -117,6 +117,14 @@ class VideoControllerTest extends TestCase
         ];
         $this->assertInvalidationInStoreAction($data, 'exists');
         $this->assertInvalidationInUpdateAction($data, 'exists');
+
+        $category = factory(Category::class)->create();
+        $category->delete();
+        $data = [
+            'categories_id' => [$category->id]
+        ];
+        $this->assertInvalidationInStoreAction($data, 'exists');
+        $this->assertInvalidationInUpdateAction($data, 'exists');
     }
 
     public function testInvalidationGenresIdField()
@@ -138,6 +146,7 @@ class VideoControllerTest extends TestCase
     {
         $category = factory(Category::class)->create();
         $genre = factory(Genre::class)->create();
+        $genre->categories()->sync($category->id);
 
         $data = [
             [
@@ -186,6 +195,22 @@ class VideoControllerTest extends TestCase
         };
     }
 
+    public function assertHasCategory($videoId, $categoryId)
+    {
+        $this->assertDatabaseHas('category_genre', [
+            'genre_id' => $videoId,
+            'category_id' => $categoryId
+        ]);
+    }
+
+    public function assertHasGenre($videoId, $genreId)
+    {
+        $this->assertDatabaseHas('category_genre', [
+            'genre_id' => $videoId,
+            'category_id' => $genreId
+        ]);
+    }
+
     public function testShow()
     {
         $response = $this->get(route('videos.show', ['video' => $this->video->id]));
@@ -231,6 +256,47 @@ class VideoControllerTest extends TestCase
             $this->assertCount(1, Video::all());
         }
     }
+
+    public function testRollbackUpdate()
+    {
+        $controller = \Mockery::mock(VideoController::class)
+            ->makePartial()
+            ->shouldAllowMockingProtectedMethods();
+
+        $controller
+            ->shouldReceive('findOrFail')
+            ->withAnyArgs()
+            ->andReturn($this->video);
+
+        $controller
+            ->shouldReceive('validate')
+            ->withAnyArgs()
+            ->andReturn($this->sendData);
+
+        $controller
+            ->shouldReceive('rulesUpdate')
+            ->withAnyArgs()
+            ->andReturn([]);
+
+        $controller
+            ->shouldReceive('handleRelations')
+            ->once()
+            ->andThrow(new TestException());
+
+        $request = \Mockery::mock(Request::class);
+
+        $hasError = false;
+
+        try {
+            $controller->update($request, 1);
+        } catch (TestException $exception) {
+            $this->assertCount(1, Video::all());
+            $hasError = true;
+        }
+
+        $this->assertTrue($hasError);
+    }
+
 
     protected function routeStore()
     {
