@@ -7,10 +7,7 @@ use App\Models\Genre;
 use App\Models\Video;
 use App\Models\Category;
 use Tests\Traits\TestSaves;
-use Illuminate\Http\Request;
 use Tests\Traits\TestValidations;
-use Tests\Exceptions\TestException;
-use App\Http\Controllers\Api\VideoController;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class VideoControllerTest extends TestCase
@@ -315,75 +312,6 @@ class VideoControllerTest extends TestCase
             'genre_id' => $genreId[2],
             'video_id' => $response->json('id')
         ]);
-    }
-    public function testRollbackStore()
-    {
-        $controller = \Mockery::mock(VideoController::class)
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods();
-
-        $controller
-            ->shouldReceive('validate')
-            ->withAnyArgs()
-            ->andReturn($this->sendData);
-
-        $controller
-            ->shouldReceive('rulesStore')
-            ->withAnyArgs()
-            ->andReturn([]);
-
-        $request = \Mockery::mock(Request::class);
-
-        $controller->shouldReceive('handleRelations')
-            ->once()
-            ->andThrow(new TestException());
-
-
-        try {
-            $controller->store($request);
-        } catch (TestException $exception) {
-            $this->assertCount(1, Video::all());
-        }
-    }
-
-    public function testRollbackUpdate()
-    {
-        $controller = \Mockery::mock(VideoController::class)
-            ->makePartial()
-            ->shouldAllowMockingProtectedMethods();
-
-        $controller
-            ->shouldReceive('findOrFail')
-            ->withAnyArgs()
-            ->andReturn($this->video);
-
-        $controller
-            ->shouldReceive('validate')
-            ->withAnyArgs()
-            ->andReturn($this->sendData);
-
-        $controller
-            ->shouldReceive('rulesUpdate')
-            ->withAnyArgs()
-            ->andReturn([]);
-
-        $controller
-            ->shouldReceive('handleRelations')
-            ->once()
-            ->andThrow(new TestException());
-
-        $request = \Mockery::mock(Request::class);
-
-        $hasError = false;
-
-        try {
-            $controller->update($request, 1);
-        } catch (TestException $exception) {
-            $this->assertCount(1, Video::all());
-            $hasError = true;
-        }
-
-        $this->assertTrue($hasError);
     }
 
 
