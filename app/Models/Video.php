@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Models\Genre;
 use App\Models\Category;
+use App\Models\Traits\UploadFiles;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Video extends Model
 {
-    use Traits\Uuid, SoftDeletes;
+    use Traits\Uuid, SoftDeletes, UploadFiles;
 
     const RATING_LIST = ['L', '10', '12', '14', '16', '18'];
 
@@ -29,14 +30,21 @@ class Video extends Model
         'year_launched' => 'integer',
         'duration' => 'integer'
     ];
+
     public $incrementing = false;
+    public static $fileFields = ['video_file'];
 
     public static function create(array $attributes = [])
     {
+        $files = self::extractFiles($attributes);
         try {
             \DB::beginTransaction();
+            /**
+             * @var Video $obj
+             */
             $obj = static::query()->create($attributes);
             static::handleRelations($obj, $attributes);
+            $obj->uploadFiles($files);
             \DB::commit();
             return $obj;
         } catch (\Exception $e) {
@@ -85,5 +93,10 @@ class Video extends Model
     public function genres()
     {
         return $this->belongsToMany(Genre::class)->withTrashed();
+    }
+
+    protected function uploadDir()
+    {
+        return $this->id;
     }
 }
