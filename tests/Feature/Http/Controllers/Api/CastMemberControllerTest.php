@@ -2,12 +2,11 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
-use App\Models\CastMember;
-use App\Models\Category;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use App\Models\CastMember;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class CastMemberControllerTest extends TestCase
 {

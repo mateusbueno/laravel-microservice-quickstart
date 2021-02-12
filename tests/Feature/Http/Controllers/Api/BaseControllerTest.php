@@ -6,7 +6,6 @@ use Tests\TestCase;
 use Illuminate\Http\Request;
 use Tests\Stubs\Models\CategoryStub;
 use App\Http\Controllers\Api\BaseController;
-use App\Models\Category;
 use Illuminate\Validation\ValidationException;
 use Tests\Stubs\Controllers\CategoryControllerStub;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

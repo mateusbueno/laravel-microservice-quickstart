@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Rules;
 
-use App\Rules\GenresHasCategoriesRule;
-use Mockery\MockInterface;
 use Tests\TestCase;
+use Mockery\MockInterface;
+use App\Rules\GenresHasCategoriesRule;
 
 class GenresHasCategoriesRuleUnitTest extends TestCase
 {
