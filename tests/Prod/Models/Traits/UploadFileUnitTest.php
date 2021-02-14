@@ -18,6 +18,7 @@ class UploadFileProdTest extends TestCase
         $this->obj = new UploadFileStub();
         \Config::set('filesystems.default', 'gcs');
         $this->deleteAllFiles();
+        $this->markTestSkipped('Testes de produção');
     }
 
     public function testUploadFile()
