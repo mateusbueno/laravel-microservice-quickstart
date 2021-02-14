@@ -5,20 +5,21 @@ namespace Tests\Prod\Models\Traits;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use Tests\Stubs\Models\UploadFileStub;
+use Tests\Traits\TestProd;
 use Tests\Traits\TestStorages;
 
 class UploadFileProdTest extends TestCase
 {
-    use TestStorages;
+    use TestStorages, TestProd;
     private $obj;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->skipTestIfNotProd();
         $this->obj = new UploadFileStub();
         \Config::set('filesystems.default', 'gcs');
         $this->deleteAllFiles();
-        $this->markTestSkipped('Testes de produção');
     }
 
     public function testUploadFile()
