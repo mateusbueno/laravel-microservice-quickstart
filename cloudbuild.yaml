@@ -1,6 +1,6 @@
 steps:
 
-  - name: "gcr.io/cloud-builders/gcloud"
+  - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - kms
       - decrypt
@@ -12,7 +12,7 @@ steps:
 
   - id: "Rodando docker-compose"
     name: "gcr.io/$PROJECT_ID/docker-compose:1.25.5"
-    args: ["-f", "docker-compose.prod.yaml", "up", "-d"],
+    args: ["-f", "docker-compose.prod.yaml", "up", "-d"]
     env:
       - GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID
       - GOOGLE_CLOUD_KEY_FILE=microservices-laravel-271fb6d00540.json
