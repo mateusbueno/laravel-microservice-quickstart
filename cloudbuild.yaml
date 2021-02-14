@@ -1,7 +1,6 @@
 steps:
 
-  - id: "descrypt microservices-laravel"
-    name: "gcr.io/cloud-builders/gcloud"
+  - name: "gcr.io/cloud-builders/gcloud"
     args:
       - kms
       - descrypt
@@ -17,7 +16,7 @@ steps:
     env:
       - GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID
       - GOOGLE_CLOUD_KEY_FILE=microservices-laravel-271fb6d00540.json
-      - GOOGLE_CLOUD_STORAGE_BUCKET=micro-videos
+      - GOOGLE_CLOUD_STORAGE_BUCKET=micro-videos-2021
       - GOOGLE_CLOUD_STORAGE_API_URI=https://storage.googleapis.com/micro-videos-2021
       - TESTING_PROD=true
 
