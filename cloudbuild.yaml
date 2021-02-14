@@ -3,7 +3,7 @@ steps:
   - name: "gcr.io/cloud-builders/gcloud"
     args:
       - kms
-      - descrypt
+      - decrypt
       - --ciphertext-file=./storage/credentials/google/microservices-laravel-271fb6d00540.json.enc
       - --plaintext-file=./storage/credentials/google/microservices-laravel-271fb6d00540.json
       - --location=global
