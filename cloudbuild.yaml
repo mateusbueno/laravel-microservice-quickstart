@@ -1,6 +1,7 @@
 steps:
 
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - id: "Gerando microservices-laravel.json"
+    name: 'gcr.io/cloud-builders/gcloud'
     args:
       - kms
       - decrypt
