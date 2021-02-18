@@ -11,6 +11,6 @@ trait TestProd
     }
 
     protected function IsTestingProd() {
-        return env('TESTING_PRO') !== false;
+        return env('TESTING_PROD') !== false;
     }
 }
