@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 
@@ -14,18 +13,6 @@ class CategoryController extends BaseController
         'description' => 'nullable',
         'is_active' => 'boolean'
     ];
-
-    public function index()
-    {
-        $collection = parent::index();
-        return CategoryResource::collection($collection);
-    }
-
-    public function show($id)
-    {
-        $obj = parent::show($id);
-        return new CategoryResource($obj);
-    }
 
     protected function model()
     {
@@ -40,5 +27,15 @@ class CategoryController extends BaseController
     protected function rulesUpdate()
     {
         return $this->rules;
+    }
+
+    protected function resource()
+    {
+        return CategoryResource::class;
+    }
+
+    protected function resourceCollection()
+    {
+        return $this->resource();
     }
 }

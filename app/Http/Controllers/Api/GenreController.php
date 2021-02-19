@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Genre;
 use Illuminate\Http\Request;
+use App\Http\Resources\GenreResource;
 
 class GenreController extends BaseController
 {
@@ -59,5 +60,15 @@ class GenreController extends BaseController
     protected function rulesUpdate()
     {
         return $this->rules;
+    }
+
+    protected function resource()
+    {
+        return GenreResource::class;
+    }
+
+    protected function resourceCollection()
+    {
+        return $this->resource();
     }
 }

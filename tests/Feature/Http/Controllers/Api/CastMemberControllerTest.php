@@ -12,7 +12,14 @@ class CastMemberControllerTest extends TestCase
 {
     use DatabaseMigrations, TestValidations, TestSaves;
     private $castMember;
-
+    private $serializedFields = [
+        'id',
+        'name',
+        'type',
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
     protected function setUp(): void
     {
         parent::setUp();
@@ -68,7 +75,7 @@ class CastMemberControllerTest extends TestCase
         foreach($data as $key => $value) {
             $response = $this->assertStore($value, $value + ['deleted_at' => null]);
             $response->assertJsonStructure([
-                'created_at', 'updated_at'
+                'data' => $this->serializedFields
             ]);
         }
     }
@@ -81,7 +88,7 @@ class CastMemberControllerTest extends TestCase
         ];
         $response = $this->assertUpdate($data, $data + ['deleted_at' => null]);
         $response->assertJsonStructure([
-            'created_at', 'updated_at'
+            'data' => $this->serializedFields
         ]);
     }
 
