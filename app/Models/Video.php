@@ -67,6 +67,7 @@ class Video extends Model
 
     public function update(array $attributes = [], array $options = [])
     {
+        $saved =  false;
         $files = self::extractFiles($attributes);
         try {
             \DB::beginTransaction();
@@ -79,12 +80,12 @@ class Video extends Model
             if($saved && count($files)) {
                 $this->deleteOldFiles();
             }
-            return $saved;
         } catch (\Exception $e) {
             $this->deleteFiles($files);
             \DB::rollBack();
             throw $e;
         }
+        return $saved;
     }
 
     public static function handleRelations(Video $video, array $attributes)

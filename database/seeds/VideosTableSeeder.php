@@ -10,8 +10,8 @@ class VideosTableSeeder extends Seeder
 {
     private $allGenres;
     private $relations = [
-        'genre_id' => [],
-        'category_id' => [],
+        'genres_id' => [],
+        'categories_id' => [],
     ];
     /**
      * Run the database seeds.
@@ -55,8 +55,8 @@ class VideosTableSeeder extends Seeder
         }
         $categoriesId = array_unique($categoriesId);;
         $genresId = $subGenres->pluck('id')->toArray();
-        $this->relations['category_id'] = $categoriesId;
-        $this->relations['genre_id'] = $genresId;
+        $this->relations['categories_id'] = $categoriesId;
+        $this->relations['genres_id'] = $genresId;
     }
 
     public function getImageFile()

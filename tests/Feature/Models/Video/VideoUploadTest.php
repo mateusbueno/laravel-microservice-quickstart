@@ -92,30 +92,44 @@ class VideoUploadTest extends BaseVideoTestCase
     public function testFileUrlsWithLocalDriver()
     {
         $fileFields = [];
+        $files = $this->getFiles();
         foreach (Video::$fileFields as $field) {
-            $fileFields[$field] = "$field.test";
+            $fileFields[$field] = $files[$field]->hashName();
         }
-        $video = factory(Video::class)->create($fileFields);
-        $localDriver = config('filesystem.default');
-        $baseUrl = config('filesystem.disks.'.$localDriver)['url'];
-        foreach ($fileFields as $field=>$value) {
+        $video = factory(Video::class)->create($fileFields + $files);
+        $localDriver = config("filesystems.default");
+        $baseUrl = config("filesystems.disks." . $localDriver)["url"];
+        foreach ($fileFields as $field => $value) {
             $fileUrl = $video->{"{$field}_url"};
+
             $this->assertEquals("{$baseUrl}/$video->id/$value", $fileUrl);
         }
     }
 
-    public function testFileUrlsWithGcpDriver()
+    public function testFileUrlsWithGcsDriver()
     {
         $fileFields = [];
+        $files = $this->getFiles();
         foreach (Video::$fileFields as $field) {
-            $fileFields[$field] = "$field.test";
+            $fileFields[$field] = $files[$field]->hashName();
         }
-        $video = factory(Video::class)->create($fileFields);
-        $baseUrl = config('filesystem.disks.gcs.storage_api_uri');
-        \Config::set('filesystem.default', 'gcs');
+        $video = factory(Video::class)->create($fileFields + $files);
+        $baseUrl = config("filesystems.disks.gcs.storage_api_uri");
+        \Config::set("filesystems.default", 'gcs');
         foreach ($fileFields as $field => $value) {
             $fileUrl = $video->{"{$field}_url"};
+
             $this->assertEquals("{$baseUrl}/$video->id/$value", $fileUrl);
         }
+    }
+
+    private function getFiles()
+    {
+        return [
+            'thumb_file' => UploadedFile::fake()->image('thumb.jpg'),
+            'video_file' => UploadedFile::fake()->image('video.mp4'),
+            'banner_file' => UploadedFile::fake()->image('banner_file.jpg'),
+            'trailer_file' => UploadedFile::fake()->image('trailer_file.mp4'),
+        ];
     }
 }

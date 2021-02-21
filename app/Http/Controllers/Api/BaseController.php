@@ -14,11 +14,8 @@ abstract class BaseController extends Controller
     protected $paginationSize = 15;
 
     protected abstract function model();
-
     protected abstract function rulesStore();
-
     protected abstract function rulesUpdate();
-
     protected abstract function resource();
     protected abstract function resourceCollection();
 
