@@ -1,4 +1,4 @@
-FROM php:7.3.6-fpm-alpine3.9
+FROM php:7.3.6-fpm-alpine3.10
 
 RUN apk add --no-cache openssl \
     bash \
@@ -28,6 +28,8 @@ RUN ln -s public html
 
 #RUN usermod -u 1000 www-data
 #USER www-data
+
+RUN npm config set cache /var/www/.npm-cache --global
 
 RUN apk add --no-cache \
         shadow \
