@@ -1,6 +1,7 @@
 // @flow 
 import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
+import { httpVideo } from '../../util/http';
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -17,18 +18,19 @@ const columnsDefinition: MUIDataTableColumn[] = [
     }
 ]
 
-const data  = [
-    {name: "test1", is_active: true, createad: "2021-12-12"},
-    {name: "test2", is_active: false, createad: "2021-01-12"},
-    {name: "test3", is_active: true, createad: "2021-03-12"},
-    {name: "test4", is_active: true, createad: "2021-05-12"},
-    {name: "test5", is_active: true, createad: "2021-04-12"},
-]
-
 type Props = {
     
 };
 const Table = (props: Props) => {
+
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        httpVideo.get('categories').then(
+            response => setData(response.data.data)
+        )
+    }, []);
+
     return (
         <div>
             <MUIDataTable 
