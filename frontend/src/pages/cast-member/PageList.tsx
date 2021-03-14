@@ -14,7 +14,7 @@ const PagList = () => {
                 title="Adicionar membro de elenco"
                 size="small"
                 component={Link}
-                to="/cast_members/create"
+                to="/cast-members/create"
             >
                 <Add/>
             </Fab>
