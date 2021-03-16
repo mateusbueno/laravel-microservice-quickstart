@@ -21,6 +21,7 @@ export const Form = (props: Props) => {
 
     const buttonProps: ButtonProps = {
         variant: 'contained',
+        color: 'secondary',
         size: 'medium',
         className: classes.submit
     }
@@ -60,18 +61,13 @@ export const Form = (props: Props) => {
             />
             <Checkbox
                 name="is_active"
+                color={'primary'}
                 inputRef={register}
                 defaultChecked
             />
             Ativo
             <Box>
-                <Button
-                    color={"primary"}
-                    {...buttonProps} 
-                    onClick={() => onSubmit(getValues(), null)
-                }>
-                    Salvar
-                </Button>
+                <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
                 <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
             </Box>
         </form>

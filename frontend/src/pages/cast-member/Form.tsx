@@ -32,7 +32,8 @@ export const Form = (props: Props) => {
     const classes = useStyles();
 
     const buttonProps: ButtonProps = {
-        variant: 'outlined',
+        variant: 'contained',
+        color: 'secondary',
         size: 'medium',
         className: classes.submit
     }
@@ -67,8 +68,8 @@ export const Form = (props: Props) => {
                     onChange={(e) => {
                         setValue('type', parseInt(e.target.value));
                     }}>
-                    <FormControlLabel value="1" control={<Radio/>} label="Diretor"/>
-                    <FormControlLabel value="2" control={<Radio/>} label="Ator"/>
+                    <FormControlLabel value="1" control={<Radio color={'primary'} />} label="Diretor"/>
+                    <FormControlLabel value="2" control={<Radio color={'primary'} />} label="Ator"/>
                 </RadioGroup>
             </FormControl>
             <Box>
