@@ -3,6 +3,8 @@ import { Box, Button, ButtonProps, Checkbox, makeStyles, TextField, Theme } from
 import * as React from 'react';
 import { useForm } from 'react-hook-form';
 import categoryHttp from '../../util/http/category-http';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -12,10 +14,11 @@ const useStyles = makeStyles((theme: Theme) => {
     }
 })
 
-type Props = {
-    
-};
-export const Form = (props: Props) => {
+const validationSchema = yup.object().shape({
+    name: yup.string().label('Nome').required(),
+})
+
+export const Form = () => {
 
     const classes = useStyles();
 
@@ -26,7 +29,8 @@ export const Form = (props: Props) => {
         className: classes.submit
     }
 
-    const { register, handleSubmit, getValues } = useForm({
+    const { register, handleSubmit, getValues, errors } = useForm({
+        resolver: yupResolver(validationSchema),
         defaultValues: {
             is_active: true
         }
@@ -40,6 +44,8 @@ export const Form = (props: Props) => {
             .then((response) => console.log(response));
     }
 
+    console.log(errors);
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <TextField
@@ -47,7 +53,15 @@ export const Form = (props: Props) => {
                 label="Nome"
                 fullWidth
                 variant={'outlined'}
-                inputRef={register}
+                inputRef={register({
+                    required: 'O campo nome e requerido',
+                    maxLength: {
+                        value: 2,
+                        message: 'O maximo caracteres e 2'
+                    }
+                })}
+                error={(errors as any).name !== undefined}
+                helperText={(errors as any).name && (errors as any).name.message}
             />
             <TextField
                 name="description"
