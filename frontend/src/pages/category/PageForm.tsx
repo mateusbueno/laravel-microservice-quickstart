@@ -1,13 +1,14 @@
 // @flow 
 import * as React from 'react';
+import { useParams } from 'react-router';
 import { Page } from '../../components/Page';
+import { IUserRouteParams } from '../../util/models/interfaces';
 import { Form } from './Form';
-type Props = {
-    
-};
-const PageForm = (props: Props) => {
+
+const PageForm = () => {
+    const { id } = useParams<IUserRouteParams>();
     return (
-        <Page title="Criar categoria">
+        <Page title={!id ? "Criar categoria" : "Editar categoria"}>
             <Form/>
         </Page>
     );
