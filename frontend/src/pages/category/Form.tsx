@@ -5,8 +5,9 @@ import { useForm } from 'react-hook-form';
 import categoryHttp from '../../util/http/category-http';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from '../../util/vendor/yup';
-import { useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 import { IUserRouteParams } from '../../util/models/interfaces';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -25,23 +26,24 @@ const validationSchema = yup.object().shape({
 
 export const Form = () => {
 
-    const classes = useStyles();
-
     const { 
-            register, 
-            handleSubmit, 
-            getValues, 
-            errors, 
-            reset, 
-            watch, 
-            setValue 
-        } = useForm({
+        register, 
+        handleSubmit, 
+        getValues, 
+        errors, 
+        reset, 
+        watch, 
+        setValue 
+    } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
             is_active: true
         }
     });
-
+    
+    const classes = useStyles();
+    const snackbar = useSnackbar();
+    const history = useHistory();
     const {id} = useParams<IUserRouteParams>();
     const [ category, setCategory] = useState<{id: string} | null>(null);
     const [ loading, setLoading ] = useState<boolean>(false);
@@ -62,26 +64,56 @@ export const Form = () => {
         if(!id) {
             return;
         }
-        setLoading(true);
-        categoryHttp
-            .get(id)
-            .then(({data}) => {
+        async function getCategory() {
+            setLoading(true);
+            try {
+                const { data } = await categoryHttp.get(id);
                 setCategory(data.data);
                 reset(data.data);
-            })
-            .finally(() => setLoading(false))
-            // eslint-disable-next-line
+            } catch(error) {
+                console.log(error);
+                snackbar.enqueueSnackbar(
+                    'Nao foi possivel carregar as informacoes!', { 
+                    variant: 'error' 
+                });
+            } finally {
+                setLoading(false);
+            }
+        }
+        getCategory();
+
+    // eslint-disable-next-line
     }, []);
 
-    function onSubmit(formData, event) {
+    async function onSubmit(formData, event) {
         setLoading(true);
-        const http = !category ? categoryHttp.create(formData) : categoryHttp.update(category.id, formData);
-        http
-            .then((response) => console.log(response))
-            .finally(() => setLoading(false))
+        try {
+            const http = !category 
+                     ? categoryHttp.create(formData) 
+                     : categoryHttp.update(category.id, formData);
+            const { data } = await http;
+            snackbar.enqueueSnackbar(
+                'Categoria salva com sucesso!', { 
+                variant: 'success' 
+            });
+            setTimeout(() => {
+                event
+                    ? (
+                        id
+                            ? history.replace(`/categories/${data.data.id}`)
+                            : history.push(`/categories/${data.data.id}/edit`)
+                    ) : history.push(`/categories`)
+            });
+        } catch (error) {
+            console.log(error);
+            snackbar.enqueueSnackbar(
+                'Nao foi possivel salvar a categoria!', { 
+                variant: 'error' 
+            });
+        } finally {
+            setLoading(false);
+        }
     }
-
-    console.log(errors);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>

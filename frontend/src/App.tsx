@@ -7,11 +7,13 @@ import { BrowserRouter } from 'react-router-dom';
 import AppRoute from './routes/AppRoute';
 import Breadcrumb from './components/Breadcrumb';
 import theme from './theme';
+import { SnackBarProvider } from './components/SnackBarProvider';
 
 function App() {
   return (
     <React.Fragment>
       <MuiThemeProvider theme={theme}>
+        <SnackBarProvider>
         <CssBaseline/>
         <BrowserRouter>
           <Navbar />
@@ -20,6 +22,7 @@ function App() {
             <AppRoute />
           </Box>
         </BrowserRouter>
+        </SnackBarProvider>
       </MuiThemeProvider>
     </React.Fragment>
   );
