@@ -57,14 +57,10 @@ export const Form = () => {
     }
 
     useEffect(() => {
-        register({name: 'is_active'})
-    }, [register]);
-
-    useEffect(() => {
         if(!id) {
             return;
         }
-        async function getCategory() {
+        (async function getCategory() {
             setLoading(true);
             try {
                 const { data } = await categoryHttp.get(id);
@@ -79,11 +75,14 @@ export const Form = () => {
             } finally {
                 setLoading(false);
             }
-        }
-        getCategory();
+        })()
 
     // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        register({name: 'is_active'})
+    }, [register]);
 
     async function onSubmit(formData, event) {
         setLoading(true);
@@ -100,7 +99,7 @@ export const Form = () => {
                 event
                     ? (
                         id
-                            ? history.replace(`/categories/${data.data.id}`)
+                            ? history.replace(`/categories/${data.data.id}/edit`)
                             : history.push(`/categories/${data.data.id}/edit`)
                     ) : history.push(`/categories`)
             });

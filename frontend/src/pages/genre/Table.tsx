@@ -1,10 +1,10 @@
 // @flow 
 import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import React, { useEffect, useState } from 'react';
-import { httpVideo } from '../../util/http';
 
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
+import genreHttp from '../../util/http/genre-http';
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -39,9 +39,16 @@ const Table = (props: Props) => {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        httpVideo.get('genres').then(
-            response => setData(response.data.data)
-        )
+        let isCancelled = false;
+        (async function getGenres() {
+            const {data} = await genreHttp.list();
+            if (!isCancelled) {
+                setData(data.data)
+            }
+        })();
+        return () => {
+            isCancelled = true;
+        }
     }, []);
 
     return (
