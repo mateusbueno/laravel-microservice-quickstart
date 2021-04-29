@@ -53,8 +53,6 @@ export default function Breadcrumb() {
                           .find(path => new RouteParser(path)
                           .match(to));
 
-          console.log(route);
-
           if (route === undefined) {
             return false;
           }
