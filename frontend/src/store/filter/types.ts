@@ -41,4 +41,19 @@ export interface SetOderAction extends AnyAction {
     }
 }
 
-export type Actions = SetSearchAction | SetPageAction | SetPerPageAction | SetOderAction;
+export interface UpdateExtraFilterAction extends AnyAction{
+    payload: {[key: string]: any }
+}
+
+export interface SetResetAction extends AnyAction {
+    payload: {
+        state: State,
+    }
+}
+
+export type Actions = SetSearchAction 
+    | SetPageAction 
+    | SetPerPageAction 
+    | SetOderAction
+    | UpdateExtraFilterAction
+    | SetResetAction
