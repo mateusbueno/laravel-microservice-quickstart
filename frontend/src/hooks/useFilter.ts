@@ -17,7 +17,13 @@ interface FilterManagerOptions {
     debounceTime: number;
     history: History;
     tableRef: React.MutableRefObject<MuiDataTableRefComponent>;
-    //extraFilter?: ExtraFilter;
+    extraFilter?: ExtraFilter;
+}
+
+interface ExtraFilter {
+    getStateFromURL: (queryParams: URLSearchParams) => any,
+    formatSearchParams: (debouncedState: FilterState) => any,
+    createValidationSchema: () => any,
 }
 
 interface UseFilterOptions extends Omit<FilterManagerOptions, 'history'> { }
@@ -25,7 +31,7 @@ interface UseFilterOptions extends Omit<FilterManagerOptions, 'history'> { }
 export default function useFilter(options: UseFilterOptions) {
     const history = useHistory();
     const filterManager = new FilterManager({...options, history});
-    const INITIAL_STATE = filterManager.getStateFromUrl();
+    const INITIAL_STATE = filterManager.getStateFromURL();
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [filterState, dispatch] = useReducer<Reducer<FilterState, FilterActions>>(reducer, INITIAL_STATE);
     const [debouncedFilterState] = useDebounce(filterState, options.debounceTime);
@@ -58,16 +64,17 @@ export class FilterManager {
     debounceTime: number;
     history: History;
     tableRef: React.MutableRefObject<MuiDataTableRefComponent>
-    //extraFilter?: ExtraFilter;
+    extraFilter?: ExtraFilter;
 
     constructor(options: FilterManagerOptions) {
-        const { columns, rowsPerPage, rowsPerPageOptions, debounceTime, history, tableRef } = options;
+        const { columns, rowsPerPage, rowsPerPageOptions, debounceTime, history, tableRef, extraFilter } = options;
         this.columns = columns;
         this.rowsPerPage = rowsPerPage;
         this.rowsPerPageOptions = rowsPerPageOptions;
         this.debounceTime = debounceTime;
         this.history = history;
         this.tableRef = tableRef;
+        this.extraFilter = extraFilter;
         this.createValidationSchema();
     };
 
@@ -175,11 +182,14 @@ export class FilterManager {
                     sort: this.debouncedState.order.sort,
                     dir: this.debouncedState.order.dir
                 }
+            ),
+            ...(
+                this.extraFilter && this.extraFilter.formatSearchParams(this.debouncedState)
             )
         }
     }
 
-    getStateFromUrl() {
+    getStateFromURL() {
         const queryParams = new URLSearchParams(this.history.location.search.substr(1));
         return this.schema.cast({
             search: queryParams.get('search'),
@@ -190,7 +200,12 @@ export class FilterManager {
             order: {
                 sort: queryParams.get('sort'),
                 dir: queryParams.get('dir')
-            }
+            },
+            ...(
+                this.extraFilter && {
+                    extraFilter: this.extraFilter.getStateFromURL(queryParams)
+                }
+            )
         })
     }
 
@@ -221,7 +236,12 @@ export class FilterManager {
                     .nullable()
                     .transform(value => !value || !['asc', 'desc'].includes(value.toLowerCase()) ? undefined : value)
                     .default(null)
-            })
+            }),
+            ...(
+                this.extraFilter && {
+                    extraFilter: this.extraFilter.createValidationSchema()
+                }
+            )
         })
     }
     
