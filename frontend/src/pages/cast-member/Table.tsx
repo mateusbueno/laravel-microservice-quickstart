@@ -15,6 +15,7 @@ import DefaultTable, { makeActionStyle, MuiDataTableRefComponent, TableColumn } 
 import useFilter from '../../hooks/useFilter';
 import { FilterResetButton } from '../../components/Table/FilterResetButton';
 import * as yup from '../../util/vendor/yup';
+import { invert } from 'lodash';
 
 const CastMemberTypeMap = {
     0: 'Diretor',
@@ -42,6 +43,9 @@ const columnsDefinition: TableColumn[] = [
         label: "Tipo",
         width: "25%",
         options: {
+            filterOptions: {
+                names: castMemberNames
+            },
             customBodyRender: (value, tableMeta, updateValue) => {
                 return CastMemberTypeMap[value];
             }
@@ -133,6 +137,17 @@ const Table = () => {
         }
     });
 
+    //?type=Diretor
+    const indexColumnType = columns.findIndex(c => c.name === 'type');
+    const columnType = columns[indexColumnType];
+    const typeFilterValue = filterState.extraFilter && filterState.extraFilter.type as never;
+    (columnType.options as any).filterList = typeFilterValue ? [typeFilterValue] : [];
+
+    const serverSideFilterList = columns.map(column => []);
+    if (typeFilterValue) {
+        serverSideFilterList[indexColumnType] = [typeFilterValue];
+    }
+
     useEffect(() => {
         filterManager.replaceHistory();
     }, []);
@@ -150,6 +165,7 @@ const Table = () => {
         debouncedFilterState.pagination.page,
         debouncedFilterState.pagination.per_page,
         debouncedFilterState.order,
+        JSON.stringify(debouncedFilterState.extraFilter)
     ]);
 
     async function getData() {
@@ -162,6 +178,11 @@ const Table = () => {
                     per_page: filterState.pagination.per_page,
                     sort: filterState.order.sort,
                     dir: filterState.order.dir,
+                    ...(
+                        debouncedFilterState.extraFilter &&
+                        debouncedFilterState.extraFilter.type &&
+                        {type: invert(CastMemberTypeMap)[debouncedFilterState.extraFilter.type]}
+                    )
                 }
             });
             if (subscribed.current) {
@@ -193,6 +214,7 @@ const Table = () => {
                 ref={tableRef}
                 options={
                     {
+                        serverSideFilterList,
                         serverSide: true,
                         responsive: "standard",
                         searchText: filterState.search as any,
@@ -200,6 +222,12 @@ const Table = () => {
                         rowsPerPage: filterState.pagination.per_page,
                         rowsPerPageOptions,
                         count: totalRecords,
+                        onFilterChange: (column, filterList, type) => {
+                            const columnIndex = columns.findIndex(c => c.name === column);
+                            filterManager.changeExtraFilter({
+                                [column]: filterList[columnIndex].length ? filterList[columnIndex][0] : null
+                            })
+                        },
                         customToolbar: () => (
                             <FilterResetButton
                                 handleClick={() => filterManager.resetFilter()}

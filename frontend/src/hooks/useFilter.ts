@@ -143,6 +143,10 @@ export class FilterManager {
         return newText;
     }
 
+    changeExtraFilter(data) {
+        this.dispatch(Creators.UpdateExtraFilter(data));
+    }
+
     replaceHistory() {
         this.history.replace({
             pathname: this.history.location.pathname,

@@ -107,6 +107,7 @@ const Table = React.forwardRef<MuiDataTableRefComponent, TableProps>((props, ref
     const isSmOrDown = useMediaQuery(theme.breakpoints.down('sm'));
     
     const defaultOptions = makeDefaultOptions(props.debouncedSearchTime);
+    
     const newProps = merge(
         { options: cloneDeep(defaultOptions) },
         props,
