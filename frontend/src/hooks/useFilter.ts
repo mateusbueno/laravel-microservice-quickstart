@@ -144,7 +144,7 @@ export class FilterManager {
     }
 
     changeExtraFilter(data) {
-        this.dispatch(Creators.UpdateExtraFilter(data));
+        this.dispatch(Creators.updateExtraFilter(data));
     }
 
     replaceHistory() {

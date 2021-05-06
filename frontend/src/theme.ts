@@ -1,6 +1,6 @@
-import { createMuiTheme } from "@material-ui/core";
-import { green, red } from "@material-ui/core/colors";
-import { PaletteOptions, SimplePaletteColorOptions } from "@material-ui/core/styles/createPalette";
+import {createMuiTheme} from "@material-ui/core";
+import {PaletteOptions, SimplePaletteColorOptions} from "@material-ui/core/styles/createPalette";
+import {green, red} from "@material-ui/core/colors";
 
 const palette: PaletteOptions = {
     primary: {
@@ -9,20 +9,21 @@ const palette: PaletteOptions = {
     },
     secondary: {
         main: '#4db5ab',
-        contrastText: '#fafafa',
-        dark: '#055a52'
+        contrastText: '#fff',
+        dark: "#055a52"
     },
     background: {
         default: '#fafafa'
     },
     success: {
-        main: green[500],
-        contrastText: '#fff',
+        main: green["500"],
+        contrastText: '#fff'
     },
     error: {
-        main: red[400]
-    }
-}
+        main: red["500"]
+    },
+};
+
 const theme = createMuiTheme({
     palette,
     overrides: {
@@ -34,19 +35,18 @@ const theme = createMuiTheme({
         MUIDataTableToolbar: {
             root: {
                 minHeight: '58px',
-                backgroundColor: palette!.background!.default,
+                backgroundColor: palette!.background!.default
             },
             icon: {
                 color: (palette!.primary as SimplePaletteColorOptions).main,
                 '&:hover, &:active, &.focus': {
-                    color: (palette!.secondary as SimplePaletteColorOptions).dark,
+                    color: (palette!.secondary as SimplePaletteColorOptions).dark
                 },
-
             },
             iconActive: {
                 color: (palette!.secondary as SimplePaletteColorOptions).dark,
                 '&:hover, &:active, &.focus': {
-                    color: (palette!.secondary as SimplePaletteColorOptions).dark,
+                    color: (palette!.secondary as SimplePaletteColorOptions).dark
                 },
             }
         },
@@ -56,14 +56,14 @@ const theme = createMuiTheme({
                 paddingBottom: 8,
                 backgroundColor: (palette!.primary as SimplePaletteColorOptions).main,
                 color: '#ffffff',
-                '&[aria-sort]': {
+                '&[aria-sort]':{
                     backgroundColor: '#459ac4',
                 }
             },
             sortActive: {
                 color: '#fff'
             },
-            sortAction: {
+            sortAction:{
                 alignItems: 'center'
             },
             sortLabelRoot: {
@@ -78,34 +78,39 @@ const theme = createMuiTheme({
                 '& span': {
                     color: '#fff !important'
                 }
-            }
+            },
         },
         MUIDataTableBodyCell: {
             root: {
                 color: (palette!.secondary as SimplePaletteColorOptions).main,
                 '&:hover, &:active, &.focus': {
                     color: (palette!.secondary as SimplePaletteColorOptions).main,
-                }
-            }
+                },
+            },
         },
-        MUIDataTableToolbarSelect: {
+        MUIDataTableToolbarSelect:{
             title: {
                 color: (palette!.primary as SimplePaletteColorOptions).main,
             },
-            iconButton: {
+            iconButton:{
                 color: (palette!.primary as SimplePaletteColorOptions).main,
             }
         },
         MUIDataTableBodyRow: {
             root: {
                 '&:nth-child(odd)': {
-                    backgroundColor: palette!.background!.default,
+                    backgroundColor: palette!.background!.default
                 }
             }
         },
         MUIDataTablePagination: {
             root: {
                 color: (palette!.primary as SimplePaletteColorOptions).main,
+            }
+        },
+        MUIDataTableFilterList: {
+            root: {
+                marginBottom: '16px'
             }
         }
     }

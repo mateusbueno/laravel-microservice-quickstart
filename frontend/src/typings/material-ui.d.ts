@@ -1,27 +1,30 @@
 import {ComponentNameToClassKey} from '@material-ui/core/styles/overrides';
-import {PaletteColor, PaletteOptions, Palette, PaletteColorOptions} from '@material-ui/core/styles/createPalette';
+import {PaletteOptions, Palette, PaletteColor, PaletteColorOptions} from "@material-ui/core/styles/createPalette";
 
-declare module '@material-ui/core/styles/overrides'{
+declare module '@material-ui/core/styles/overrides' {
     interface ComponentNameToClassKey {
         MUIDataTable: any;
         MUIDataTableToolbar: any;
+        MuiTableSortLabel: any;
         MUIDataTableHeadCell: any;
-        MuiDataTableSortLabel: any;
         MUIDataTableSelectCell: any;
         MUIDataTableBodyCell: any;
         MUIDataTableToolbarSelect: any;
         MUIDataTableBodyRow: any;
         MUIDataTablePagination: any;
+        MUIDataTableFilterList: any;
     }
 }
 
+
 declare module '@material-ui/core/styles/createPalette' {
-    import {PaletteColorOptions} from '@material-ui/core/styles';
+    import {PaletteColorOptions} from "@material-ui/core/styles";
 
     interface Palette {
-        sucess: PaletteColor;
+        success: PaletteColor
     }
+
     interface PaletteOptions {
-        sucess?: PaletteColorOptions;
+        success?: PaletteColorOptions
     }
 }

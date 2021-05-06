@@ -10,7 +10,6 @@ const AppRoute = () => {
                 routes.map((route, key) => (
                     <Route
                         key={key}
-                        name={route.name}
                         path={route.path}
                         component={route.component}
                         exact={route.exact === true}

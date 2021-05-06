@@ -10,11 +10,12 @@ import parseISO from 'date-fns/parseISO';
 import { useSnackbar } from 'notistack';
 
 import genreHttp from '../../util/http/genre-http';
-import { Genre, ListResponse } from '../../util/models';
+import { Category, Genre, ListResponse } from '../../util/models';
 import DefaultTable, { makeActionStyle, MuiDataTableRefComponent, TableColumn } from '../../components/Table';
 import useFilter from '../../hooks/useFilter';
 import { FilterResetButton } from '../../components/Table/FilterResetButton';
 import * as yup from '../../util/vendor/yup';
+import categoryHttp from '../../util/http/category-http';
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -22,19 +23,27 @@ const columnsDefinition: TableColumn[] = [
         label: "ID",
         width: "20%",
         options: {
-            sort: false
+            sort: false,
+            filter: false,
         }
     },
     {
         name: "name",
         label: "Nome",
-        width: "25%"
+        width: "25%",
+        options: {
+            filter: false,
+        }
     },
     {
         name: "categories",
         label: "Categorias",
         width: "20%",
         options: {
+            filterType: 'multiselect',
+            filterOptions:{
+                names: []
+            },
             customBodyRender(value, tableMeta, updateValue) {
                 return value.map((value: any) => value.name).join(', ')
             }
@@ -45,6 +54,7 @@ const columnsDefinition: TableColumn[] = [
         label: "Criado em",
         width: "20%",
         options: {
+            filter: false,
             customBodyRender(value, tableMeta, updateValue) {
                 return <span>{format(parseISO(value), 'dd/MM/yyyy')}</span>
             }
@@ -55,6 +65,7 @@ const columnsDefinition: TableColumn[] = [
         label: "Ações",
         width: "15%",
         options: {
+            filter: false,
             customBodyRender(value, tableMeta, updateValue) {
                 return (
                     <span>
@@ -83,6 +94,7 @@ const Table = () => {
     const subscribed = useRef(true);
     const [data, setData] = useState<Genre[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [categories, setCategories] = useState<Category[]>([]);
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
 
     const {
@@ -125,6 +137,41 @@ const Table = () => {
         }
     });
 
+    const indexColumnCategories = columns.findIndex(c => c.name === 'categories');
+    const columnCategories = columns[indexColumnCategories];
+    const categoriesFilterValue = filterState.extraFilter && filterState.extraFilter.categories;
+    (columnCategories.options as any).filterList = categoriesFilterValue ? categoriesFilterValue : [];
+
+    const serverSideFilterList = columns.map(column => []);
+    if (categoriesFilterValue) {
+        serverSideFilterList[indexColumnCategories] = categoriesFilterValue;
+    }
+
+    useEffect(() => {
+        let isSubscribed = true;
+
+        (async () => {
+            try {
+               const {data} = await categoryHttp.list({queryParams: {all: ''}});
+               if (isSubscribed) {
+                   setCategories(data.data);
+                   console.log(categories);
+                   (columnCategories.options as any).filterOptions.names = data.data.map(category => category.name);
+               } 
+            } catch (error) {
+                console.error(error);
+                snackbar.enqueueSnackbar(
+                    'Nao foi possivel carregar as informacoes',
+                    { variant: 'error' }
+                )
+            }
+        })();
+
+        return () => {
+            isSubscribed = false;
+        }
+    })
+
     useEffect(() => {
         filterManager.replaceHistory();
     }, []);
@@ -142,6 +189,7 @@ const Table = () => {
         debouncedFilterState.pagination.page,
         debouncedFilterState.pagination.per_page,
         debouncedFilterState.order,
+        JSON.stringify(debouncedFilterState.extraFilter)
     ]);
 
     async function getData() {
@@ -154,6 +202,11 @@ const Table = () => {
                     per_page: filterState.pagination.per_page,
                     sort: filterState.order.sort,
                     dir: filterState.order.dir,
+                    ...(
+                        debouncedFilterState.extraFilter &&
+                        debouncedFilterState.extraFilter.categories &&
+                        {categories: debouncedFilterState.extraFilter.categories.join(',')}
+                    )
                 }
             });
             if (subscribed.current) {
@@ -185,13 +238,20 @@ const Table = () => {
                 ref={tableRef}
                 options={
                     {
+                        serverSideFilterList,
                         serverSide: true,
-                        responsive: "standard",
+                        responsive: "scrollMaxHeight",
                         searchText: filterState.search as any,
                         page: filterState.pagination.page - 1,
                         rowsPerPage: filterState.pagination.per_page,
                         rowsPerPageOptions,
                         count: totalRecords,
+                        onFilterChange: (column, FilterList) => {
+                            const columnIndex = columns.findIndex(c => c.name === column);
+                            filterManager.changeExtraFilter({
+                                [column]: FilterList[columnIndex].length ? FilterList[columnIndex] : null
+                            })
+                        },
                         customToolbar: () => (
                             <FilterResetButton
                                 handleClick={() => filterManager.resetFilter()}

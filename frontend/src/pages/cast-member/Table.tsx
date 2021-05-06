@@ -30,13 +30,17 @@ const columnsDefinition: TableColumn[] = [
         label: "ID",
         width: "20%",
         options: {
-            sort: false
+            sort: false,
+            filter: false,
         }
     },
     {
         name: "name",
         label: "Nome",
         width: "25%",
+        options: {
+            filter: false
+        }
     },
     {
         name: "type",
@@ -56,6 +60,7 @@ const columnsDefinition: TableColumn[] = [
         label: "Criado em",
         width: "17%",
         options: {
+            filter: false,
             customBodyRender(value, tableMeta, updateValue) {
                 return <span>{format(parseISO(value), 'dd/MM/yyyy')}</span>
             }
@@ -66,6 +71,7 @@ const columnsDefinition: TableColumn[] = [
         label: "Ações",
         width: "13%",
         options: {
+            filter: false,
             customBodyRender(value, tableMeta, updateValue) {
                 return (
                     <span>
@@ -216,7 +222,7 @@ const Table = () => {
                     {
                         serverSideFilterList,
                         serverSide: true,
-                        responsive: "standard",
+                        responsive: "scrollMaxHeight",
                         searchText: filterState.search as any,
                         page: filterState.pagination.page - 1,
                         rowsPerPage: filterState.pagination.per_page,

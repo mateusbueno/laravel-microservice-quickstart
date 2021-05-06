@@ -169,7 +169,7 @@ const Table = () => {
                 options={
                     {
                         serverSide: true,
-                        responsive: "standard",
+                        responsive: "scrollMaxHeight",
                         searchText: filterState.search as any,
                         page: filterState.pagination.page - 1,
                         rowsPerPage: filterState.pagination.per_page,
