@@ -3,7 +3,9 @@ import { setLocale } from "yup";
 const ptBR = {
     mixed: {
         // eslint-disable-next-line 
-        required: '${path} e requerido'
+        required: '${path} e requerido',
+        // eslint-disable-next-line 
+        notType: '${path} e invalido'
     },
     string: {
         // eslint-disable-next-line 
