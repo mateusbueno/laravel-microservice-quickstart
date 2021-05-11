@@ -1,5 +1,5 @@
 // @flow 
-import { Checkbox, FormControlLabel, Grid, TextField, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Card, CardContent, Checkbox, FormControlLabel, Grid, makeStyles, TextField, Theme, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -7,11 +7,13 @@ import * as yup from '../../../util/vendor/yup';
 import { useHistory, useParams } from 'react-router';
 import { IUserRouteParams } from '../../../util/models/interfaces';
 import { useSnackbar } from 'notistack';
-import { Video } from '../../../util/models';
+import { Video, VideoFileFieldsMap } from '../../../util/models';
 import SubmitActions from '../../../components/SubmitActions';
 import DefaultForm from '../../../components/DafaultForm';
 import videoHttp from '../../../util/http/video-http';
 import RatingField from './RatingField';
+import UploadField from './UploadField';
+import classes from '*.module.css';
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -32,10 +34,21 @@ const validationSchema = yup.object().shape({
     rating: yup.string()
         .label('Classificacao')
         .required(),
-})
+});
+
+const useStyles = makeStyles((theme: Theme) => ({
+    card: {
+        borderRadius: "4px",
+        backgroundColor: "#f5f5f5",
+        margin: theme.spacing(2, 0)
+    }
+}));
+
+const fileFields = Object.keys(VideoFileFieldsMap);
 
 export const Form = () => {
 
+    const classes = useStyles();
     const {
         register,
         handleSubmit,
@@ -49,7 +62,11 @@ export const Form = () => {
         resolver: yupResolver(validationSchema),
         defaultValues: {
             rating: null,
-            opened: true
+            opened: true,
+            thumb_file: '',
+            banner_file: '',
+            trailer_file: '',
+            video_file: ''
         }
     });
 
@@ -62,7 +79,7 @@ export const Form = () => {
     const isGreaterMd = useMediaQuery(theme.breakpoints.up('md'));
 
     useEffect(() => {
-        ['rating', 'opened'].forEach((name: any) => register({name}));
+        ['rating', 'opened', ...fileFields].forEach((name: any) => register({ name }));
     }, [register]);
 
     useEffect(() => {
@@ -198,7 +215,44 @@ export const Form = () => {
                         }}
                     />
                     <br />
-                    Uploads
+                    <Card className={classes.card}>
+                        <CardContent>
+                            <Typography color="primary" variant="h6">
+                                Imagens
+                            </Typography>
+                            <UploadField
+                                accept={'image/*'}
+                                label={'Thumb'}
+                                setValue={(value) => setValue('thumb_file', value)}
+                            />
+                            <UploadField
+                                accept={'images/*'}
+                                label={'Banner'}
+                                setValue={(value) => setValue('banner_file', value)}
+                            />
+                        </CardContent>
+                    </Card>
+                    <Card className={classes.card}>
+                        <CardContent>
+                            <Typography color="primary" variant="h6">
+                                Videos
+                            </Typography>
+                            <UploadField
+                                accept={'video/mp4'}
+                                label={'Trailer'}
+                                setValue={(value) => setValue('trailer_file', value)}
+                            />
+                            <UploadField
+                                accept={'video/mp4'}
+                                label={'Principal'}
+                                setValue={(value) => {
+                                    setValue('video_file', value);
+                                    console.log(getValues());
+                                }}
+                            />
+                        </CardContent>
+                    </Card>
+
                     <br />
                     <FormControlLabel
                         control={
