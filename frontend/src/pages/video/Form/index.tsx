@@ -13,7 +13,8 @@ import DefaultForm from '../../../components/DafaultForm';
 import videoHttp from '../../../util/http/video-http';
 import RatingField from './RatingField';
 import UploadField from './UploadField';
-import classes from '*.module.css';
+import AsyncAutocomplete from '../../../components/AsyncAutocomplete';
+import genreHttp from '../../../util/http/genre-http';
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -49,6 +50,7 @@ const fileFields = Object.keys(VideoFileFieldsMap);
 export const Form = () => {
 
     const classes = useStyles();
+
     const {
         register,
         handleSubmit,
@@ -134,7 +136,14 @@ export const Form = () => {
         } finally {
             setLoading(false);
         }
-    }
+    };
+
+    const fetchOptions = (searchText) => genreHttp.list({
+        queryParams: {
+            search: searchText,
+            all: ''
+        },
+    }).then(({data}) => data.data);
 
     return (
         <DefaultForm
@@ -202,7 +211,16 @@ export const Form = () => {
                     </Grid>
                     Elenco
                     <br />
-                    Generos e Categorias
+                    <AsyncAutocomplete
+                        fetchOptions={fetchOptions}
+                        AutoCompleteProps={{
+                            freeSolo: true,
+                            getOptionLabel: option => option.name
+                        }}
+                        TextFieldProps={{
+                            label: 'Generos'
+                        }}
+                    />
                 </Grid>
                 <Grid item xs={12} md={6}>
                     <RatingField
