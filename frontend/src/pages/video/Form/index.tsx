@@ -1,5 +1,5 @@
 // @flow 
-import { Card, CardContent, Checkbox, FormControlLabel, Grid, makeStyles, TextField, Theme, Typography, useMediaQuery, useTheme } from '@material-ui/core';
+import { Card, CardContent, Checkbox, FormControlLabel, FormHelperText, Grid, makeStyles, TextField, Theme, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,8 +13,8 @@ import DefaultForm from '../../../components/DafaultForm';
 import videoHttp from '../../../util/http/video-http';
 import RatingField from './RatingField';
 import UploadField from './UploadField';
-import AsyncAutocomplete from '../../../components/AsyncAutocomplete';
-import genreHttp from '../../../util/http/genre-http';
+import GenreField from './GenreField';
+import CategoryField from './CategoryField';
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -68,7 +68,9 @@ export const Form = () => {
             thumb_file: '',
             banner_file: '',
             trailer_file: '',
-            video_file: ''
+            video_file: '',
+            genres: [],
+            categories: []
         }
     });
 
@@ -81,7 +83,13 @@ export const Form = () => {
     const isGreaterMd = useMediaQuery(theme.breakpoints.up('md'));
 
     useEffect(() => {
-        ['rating', 'opened', ...fileFields].forEach((name: any) => register({ name }));
+        [
+            'rating', 
+            'opened',
+            'genres',
+            'categories',
+            ...fileFields
+        ].forEach((name: any) => register({ name }));
     }, [register]);
 
     useEffect(() => {
@@ -137,13 +145,6 @@ export const Form = () => {
             setLoading(false);
         }
     };
-
-    const fetchOptions = (searchText) => genreHttp.list({
-        queryParams: {
-            search: searchText,
-            all: ''
-        },
-    }).then(({data}) => data.data);
 
     return (
         <DefaultForm
@@ -211,16 +212,30 @@ export const Form = () => {
                     </Grid>
                     Elenco
                     <br />
-                    <AsyncAutocomplete
-                        fetchOptions={fetchOptions}
-                        AutoCompleteProps={{
-                            freeSolo: true,
-                            getOptionLabel: option => option.name
-                        }}
-                        TextFieldProps={{
-                            label: 'Generos'
-                        }}
-                    />
+                    <Grid container spacing={2}>
+                        <Grid item xs={6}>
+                            <GenreField
+                                genres={watch('genres')}
+                                setGenres={(value) => setValue('genres', value)}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
+                            <CategoryField
+                                categories={watch('categories')}
+                                setCategories={(value) => setValue('categories', value)}
+                                genres={watch(`genres`)}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <FormHelperText>
+                                Escolha os generos do video
+                            </FormHelperText>
+                            <FormHelperText>
+                                Escolha pelo menos uma categoria de cada genero
+                            </FormHelperText>
+                        </Grid>
+                    </Grid>
+
                 </Grid>
                 <Grid item xs={12} md={6}>
                     <RatingField

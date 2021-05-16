@@ -1,14 +1,14 @@
 /* eslint-disable no-mixed-operators */
 // @flow 
 import { CircularProgress, TextField, TextFieldProps } from '@material-ui/core';
-import { Autocomplete, AutocompleteProps } from '@material-ui/lab';
+import { Autocomplete, AutocompleteProps, UseAutocompleteSingleProps } from '@material-ui/lab';
 import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 
 interface AsyncAutocompleteProps {
     fetchOptions: (searchText) => Promise<any>;
     TextFieldProps?: TextFieldProps;
-    AutoCompleteProps?: Omit<AutocompleteProps<any>, 'renderInput'>;
+    AutoCompleteProps?: Omit<AutocompleteProps<any>, 'renderInput'> & UseAutocompleteSingleProps<any>;
 };
 const AsyncAutocomplete: React.FC<AsyncAutocompleteProps> = (props) => {
 
@@ -85,12 +85,6 @@ const AsyncAutocomplete: React.FC<AsyncAutocompleteProps> = (props) => {
                 if (isSubscribed) {
                     setOptions(data);
                 }
-            } catch (error) {
-                console.log(error);
-                snackbar.enqueueSnackbar(
-                    'Nao foi possivel carregar as informacoes',
-                    { variant: 'error'}
-                );
             } finally{
                 setLoading(false);
             }
