@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 use App\Http\Resources\GenreResource;
+use Illuminate\Database\Eloquent\Builder;
 
 class GenreController extends BaseController
 {
@@ -70,5 +71,10 @@ class GenreController extends BaseController
     protected function resourceCollection()
     {
         return $this->resource();
+    }
+
+    protected function queryBuilder(): Builder
+    {
+        return parent::queryBuilder()->with('categories');
     }
 }

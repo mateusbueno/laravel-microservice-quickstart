@@ -1,3 +1,4 @@
+import { addMethod, NumberSchema, number } from "yup";
 import { setLocale } from "yup";
 
 const ptBR = {
@@ -18,5 +19,14 @@ const ptBR = {
 }
 
 setLocale(ptBR);
+
+addMethod<NumberSchema>(number, 'xpto', function() {
+    return this.test({
+        message: 'message de error',
+        test: (value) => {
+            return true
+        }
+    })
+})
 
 export * from 'yup';

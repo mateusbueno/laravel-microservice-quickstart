@@ -13,6 +13,8 @@ import EditIcon from '@material-ui/icons/Edit';
 import { FilterResetButton } from '../../components/Table/FilterResetButton';
 import useFilter from '../../hooks/useFilter';
 import videoHttp from '../../util/http/video-http';
+import { DeleteDialog } from '../../components/DeleteDialog';
+import useDeleteCollection from '../../hooks/useDeleteCollection';
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -100,6 +102,7 @@ const Table = () => {
     const subscribed = useRef(true);
     const [data, setData] = useState<Video[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const {openDeleteDialog, setOpenDeleteDialog, rowsToDelete, setRowsToDelete} = useDeleteCollection();
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
 
     const {
@@ -151,6 +154,9 @@ const Table = () => {
             if (subscribed.current) {
                 setData(data.data);
                 setTotalRecords(data.meta.total);
+                if(openDeleteDialog) {
+                    setOpenDeleteDialog(false);
+                }
             }
         } catch (error) {
             console.error(error);
@@ -164,10 +170,46 @@ const Table = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    function deleteRows(confirmed: boolean) {
+        if (!confirmed) {
+            setOpenDeleteDialog(false);
+            return;
+        }
+        const ids = rowsToDelete
+            .data
+            .map((value) => data[value.index].id)
+            .join(',');
+        videoHttp
+            .deleteCollection({ids})
+            .then(response => {
+                snackbar.enqueueSnackbar(
+                    'Registros excluídos com sucesso',
+                    {variant: 'success'}
+                );
+                if (
+                    rowsToDelete.data.length === filterState.pagination.per_page
+                    && filterState.pagination.page > 1
+                ) {
+                    const page = filterState.pagination.page -2;
+                    filterManager.changePage(page);
+                } else {
+                    getData();
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                snackbar.enqueueSnackbar(
+                    'Nao foi possível excluir os registros',
+                    {variant: 'error'}
+                )
+            })
     }
 
     return (
         <MuiThemeProvider theme={makeActionStyle(columnsDefinition.length - 1)}>
+            <DeleteDialog open={openDeleteDialog} handleClose={deleteRows} />
             <DefaultTable
                 title="Listagem de videos"
                 columns={columns}
@@ -193,6 +235,10 @@ const Table = () => {
                         onChangePage: (page: number) => filterManager.changePage(page),
                         onChangeRowsPerPage: (perPage: number) => filterManager.changeRowsPerPage(perPage),
                         onColumnSortChange: (changedColumn: string, direction: string) => filterManager.changeColumnSort(changedColumn, direction),
+                        onRowsDelete: (rowsDeleted) => {
+                            setRowsToDelete(rowsDeleted as any);
+                            return false
+                        }
                     }
                 }
             />

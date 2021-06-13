@@ -1,21 +1,43 @@
 // @flow 
-import { Typography } from '@material-ui/core';
-import * as React from 'react';
-import AsyncAutocomplete from '../../../components/AsyncAutocomplete';
+import { FormControl, FormControlProps, FormHelperText, Typography } from '@material-ui/core';
+import React, {MutableRefObject, RefAttributes, useImperativeHandle, useRef} from 'react';
+import AsyncAutocomplete, { AsyncAutocompleteComponent } from '../../../components/AsyncAutocomplete';
 import GridSelected from '../../../components/GridSelected';
 import { GridSelectedItem } from '../../../components/GridSelectedItem';
 import useCollectionManager from '../../../hooks/useCollectionManager';
 import useHttpHandled from '../../../hooks/useHttpHandled';
 import genreHttp from '../../../util/http/genre-http';
+import { getGenresFromCategory } from '../../../util/model-filters';
+import { Category } from '../../../util/models';
 
-interface GenreFieldProps {
+interface GenreFieldProps extends RefAttributes<GenreFieldProps>{
     genres: any[];
     setGenres: (genres) => void;
+    error: any;
+    categories: Category[];
+    setCategories: (categories) => void;
+    disabled?: boolean;
+    FormControlProps?: FormControlProps
 };
-const GenreField: React.FC<GenreFieldProps> = (props) => {
-    const { genres, setGenres } = props;
-    const { addItem } = useCollectionManager(genres, setGenres);
+
+export interface GenreFieldComponent {
+    clear: () => void;
+}
+
+const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>((props, ref) => {
+    const { 
+            genres, 
+            setGenres, 
+            error, 
+            disabled,
+            categories,
+            setCategories,
+        } = props;
+    const { addItem, removeItem } = useCollectionManager(genres, setGenres);
+    const { removeItem: removeCategory } = useCollectionManager(categories, setCategories);
     const autocompleteHttp = useHttpHandled();
+    const autocompleteRef = useRef() as MutableRefObject<AsyncAutocompleteComponent>;
+
     const fetchOptions = (searchText) => autocompleteHttp(
         genreHttp.list({
             queryParams: {
@@ -27,31 +49,65 @@ const GenreField: React.FC<GenreFieldProps> = (props) => {
         .then((data) => data.data)
         .catch((error) => console.log(error));
 
+    useImperativeHandle(ref, () => ({
+        clear: () => autocompleteRef.current.clear()
+    }));
+
     return (
         <>
             <AsyncAutocomplete
+                ref={autocompleteRef}
                 fetchOptions={fetchOptions}
                 AutoCompleteProps={{
+                    autoSelect: true,
+                    clearOnEscape: true,
                     freeSolo: true,
+                    //getOptionSelected: (option, value) => option.id === value.id,
                     getOptionLabel: option => option.name,
-                    onChange: (event, value) => addItem(value)
+                    onChange: (event, value) => addItem(value),
+                    disabled: disabled,
                 }}
                 TextFieldProps={{
-                    label: 'Generos'
+                    label: 'Generos',
+                    error: error !== undefined
                 }}
             />
-            <GridSelected>
-                {
-                    genres.map((genre, key) => (
-                        <GridSelectedItem key={key} onClick={() => console.log('clicou!')} xs={12}>
-                            <Typography>{genre.name}</Typography>
-                        </GridSelectedItem>
-                    ))
-                }
+            <FormControl
+                margin={'normal'}
+                fullWidth
+                error={error !== undefined}
+                disabled={disabled}
+                {...props.FormControlProps}
+            >
+                <GridSelected>
+                    {
+                        genres.map((genre, key) => (
+                            <GridSelectedItem key={key} 
+                                onDelete={ 
+                                    () => {
+                                        const categoriesWithOneGenre = categories
+                                            .filter(category => {
+                                                const genresFromCategory = getGenresFromCategory(genre, category);
+                                                return genresFromCategory.length === 1 && genresFromCategory[0].id === genre.id
+                                            });
+                                        categoriesWithOneGenre.forEach(cat =>  removeCategory(cat));
+                                        removeItem(genre);
+                                    }
+                                } 
+                            xs={12}>
+                                <Typography>{genre.name}</Typography>
+                            </GridSelectedItem>
+                        ))
+                    }
 
-            </GridSelected>
+                </GridSelected>
+                {
+                    error && <FormHelperText>{error.message}</FormHelperText>
+                }
+            </FormControl>
+
         </>
     );
-};
+});
 
 export default GenreField;

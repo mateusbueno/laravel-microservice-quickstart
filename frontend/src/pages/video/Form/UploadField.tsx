@@ -1,5 +1,5 @@
 // @flow 
-import * as React from 'react';
+import React, {useImperativeHandle} from 'react';
 import {
     Button,
     FormControl,
@@ -17,9 +17,18 @@ interface UploadFieldProps {
     formControlProps?: FormControlProps
 };
 
-const UploadField: React.FC<UploadFieldProps> = (props) => {
+export interface UploadFieldComponent {
+    clear: () => void;
+}
+
+const UploadField = React.forwardRef<UploadFieldComponent, UploadFieldProps>((props, ref) => {
+
     const fileRef = React.useRef() as React.MutableRefObject<InputFileComponent>;
     const { accept, label, setValue, disabled, errors } = props;
+
+    useImperativeHandle(ref, () => ({
+        clear: () => fileRef.current.clear()
+    }))
 
     return (
         <FormControl
@@ -56,6 +65,6 @@ const UploadField: React.FC<UploadFieldProps> = (props) => {
             />
         </FormControl>
     );
-};
+});
 
 export default UploadField;

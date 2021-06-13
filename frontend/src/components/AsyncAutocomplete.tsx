@@ -3,22 +3,29 @@
 import { CircularProgress, TextField, TextFieldProps } from '@material-ui/core';
 import { Autocomplete, AutocompleteProps, UseAutocompleteSingleProps } from '@material-ui/lab';
 import { useSnackbar } from 'notistack';
-import React, { useEffect, useState } from 'react';
+import React, { RefAttributes, useEffect, useImperativeHandle, useState } from 'react';
+import { useDebounce } from 'use-debounce/lib';
 
-interface AsyncAutocompleteProps {
+interface AsyncAutocompleteProps extends RefAttributes<AsyncAutocompleteProps>{
     fetchOptions: (searchText) => Promise<any>;
+    debounceTime?: number;
     TextFieldProps?: TextFieldProps;
     AutoCompleteProps?: Omit<AutocompleteProps<any>, 'renderInput'> & UseAutocompleteSingleProps<any>;
 };
-const AsyncAutocomplete: React.FC<AsyncAutocompleteProps> = (props) => {
 
-    const {AutoCompleteProps} = props;
+export interface AsyncAutocompleteComponent {
+    clear: () => void;
+}
+const AsyncAutocomplete = React.forwardRef<AsyncAutocompleteComponent, AsyncAutocompleteProps> ((props, ref) => {
+
+    const {AutoCompleteProps, debounceTime = 300} = props;
     const {onOpen, onClose, onInputChange, freeSolo} = AutoCompleteProps as any;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const snackbar = useSnackbar();
     const [open, setOpen] = useState(false);
     const [searchText, setSearText] = useState('');
+    const [debouncedSearchText] = useDebounce(searchText, debounceTime);
     const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState([]);
 
@@ -34,6 +41,7 @@ const AsyncAutocomplete: React.FC<AsyncAutocompleteProps> = (props) => {
         loadingText: 'Carregando...',
         noOptionsText: 'Nenhum item encontrado',
         loading: loading,
+        inputValue: searchText,
         ...(props.AutoCompleteProps && { ...props.AutoCompleteProps }),
         open,
         options,
@@ -74,14 +82,14 @@ const AsyncAutocomplete: React.FC<AsyncAutocompleteProps> = (props) => {
     },[open])
 
     useEffect(() => {
-        if (!open || searchText === "" && freeSolo) {
+        if (!open || debouncedSearchText === "" && freeSolo) {
             return;
         }
         let isSubscribed = true;
         (async () => {
             setLoading(true);
             try {
-                const data = await props.fetchOptions(searchText);
+                const data = await props.fetchOptions(debouncedSearchText);
                 if (isSubscribed) {
                     setOptions(data);
                 }
@@ -90,13 +98,20 @@ const AsyncAutocomplete: React.FC<AsyncAutocompleteProps> = (props) => {
             }
         })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [freeSolo ? searchText : open]);
+    }, [freeSolo ? debouncedSearchText : open]);
+
+    useImperativeHandle(ref, () => ({
+        clear: () => {
+            setSearText('');
+            setOptions([]);
+        }
+    }));
 
     return (
         <Autocomplete
             {...autocompleteProps}
         />
     );
-};
+});
 
 export default AsyncAutocomplete;

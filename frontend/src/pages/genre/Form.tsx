@@ -32,7 +32,8 @@ export const Form = () => {
         setValue,
         errors,
         reset,
-        watch, trigger
+        watch,
+        trigger
     } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
@@ -53,7 +54,7 @@ export const Form = () => {
 
         (async function loadData() {
             setLoading(true);
-            const promises = [categoryHttp.list({ queryParams: {all: ''}})];
+            const promises = [categoryHttp.list({ queryParams: { all: '' } })];
             if (id) {
                 promises.push(genreHttp.get(id));
             }

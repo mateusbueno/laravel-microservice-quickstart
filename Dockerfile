@@ -13,6 +13,7 @@ RUN touch /root/.bashrc | echo "PS1='\w\$'" >> /root/.bashrc
 RUN docker-php-ext-install pdo pdo_mysql
 RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
 RUN docker-php-ext-install -j$(nproc) gd
+RUN npm install -g yarn
 
 ENV DOCKERIZE_VERSION v0.6.1
 RUN wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \

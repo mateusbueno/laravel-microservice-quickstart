@@ -84,4 +84,21 @@ abstract class BaseController extends Controller
     protected function queryBuilder(): Builder{
         return $this->model()::query();
     }
+    protected function destroyCollection(Request $request)
+    {
+        $data = $this->validateIds($request);
+        $this->model()::WhereIn('id', $data['ids'])->delete();
+        return response()->noContent();
+    }
+
+    protected function validateIds(Request $request)
+    {
+        $model = $this->model();
+        $ids = explode(',', $request->get('ids'));
+        $validator = \Validator::make(
+            ['ids' => $ids],
+            ['ids' => 'required|exists:' . (new $model)->getTable() . ',id']
+        );
+        return $validator->validate();
+    }
 }

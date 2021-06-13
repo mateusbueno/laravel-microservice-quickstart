@@ -25,11 +25,11 @@ export const Form = () => {
         register,
         handleSubmit,
         getValues,
+        setValue,
         errors,
         reset,
         watch,
-        trigger,
-        setValue
+        trigger
     } = useForm({
         resolver: yupResolver(validationSchema),
         defaultValues: {
@@ -102,8 +102,8 @@ export const Form = () => {
     }
 
     return (
-        <DefaultForm 
-            GridItemProps={{xs:12, md:6}}
+        <DefaultForm
+            GridItemProps={{ xs: 12, md: 6 }}
             onSubmit={handleSubmit(onSubmit)}>
             <TextField
                 name="name"
@@ -145,9 +145,12 @@ export const Form = () => {
             />
             <SubmitActions
                 disabledButtons={loading}
-                handleSave={() => trigger().then(isValid => {
-                    isValid && onSubmit(getValues(), null)
-                })} />
+                handleSave={() =>
+                    trigger().then(isValid => {
+                        isValid && onSubmit(getValues(), null)
+                    })
+                }
+            />
         </DefaultForm>
     );
 };

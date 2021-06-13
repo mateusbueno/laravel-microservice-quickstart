@@ -10,6 +10,7 @@ export interface InputFileProps extends RefAttributes<InputFileComponent>{
 
 export interface InputFileComponent {
     openWindow: () => void;
+    clear: () => void;
 }
 
 const InputFile = React.forwardRef<InputFileComponent, InputFileProps>((props, ref) => {
@@ -51,7 +52,8 @@ const InputFile = React.forwardRef<InputFileComponent, InputFileProps>((props, r
     };
 
     useImperativeHandle(ref, () => ({
-        openWindow: () => fileRef.current.click()
+        openWindow: () => fileRef.current.click(),
+        clear: () => setFilename("")
     }));
 
     return (

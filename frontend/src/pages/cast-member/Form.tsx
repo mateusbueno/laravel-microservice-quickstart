@@ -10,7 +10,6 @@ import {
 } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from '../../util/vendor/yup';
 import { useSnackbar } from 'notistack';
 import { useHistory, useParams } from 'react-router';
@@ -38,7 +37,8 @@ export const Form = () => {
         setValue,
         errors,
         reset,
-        watch, trigger
+        watch,
+        trigger
     } = useForm({
         resolver: yupResolver(validationSchema),
     });
