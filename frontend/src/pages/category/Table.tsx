@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // @flow 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import EditIcon from '@material-ui/icons/Edit';
 import { FilterResetButton } from '../../components/Table/FilterResetButton';
 import useFilter from '../../hooks/useFilter';
+import LoadingContext from '../../components/loading/LoadingContext';
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -92,6 +93,7 @@ const Table = () => {
     const [data, setData] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
+    const textLoaging = useContext(LoadingContext);
 
     const {
         columns,
@@ -159,6 +161,7 @@ const Table = () => {
 
     return (
         <MuiThemeProvider theme={makeActionStyle(columnsDefinition.length - 1)}>
+            {textLoaging ? 'true': 'false'}
             <DefaultTable
                 title="Listagem de categorias"
                 columns={columns}

@@ -1,7 +1,7 @@
 // @flow 
 import { Card, CardContent, Checkbox, FormControlLabel, FormHelperText, Grid, makeStyles, TextField, Theme, Typography, useMediaQuery, useTheme } from '@material-ui/core';
 import React, { createRef, MutableRefObject, useEffect, useRef, useState } from 'react';
-import {useForm} from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from '../../../util/vendor/yup';
 import { useHistory, useParams } from 'react-router';
@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         backgroundColor: '#f5f5f5'
     },
     cardContentOpened: {
-        paddingBottom: theme.spacing(2)+ 'px !important'
+        paddingBottom: theme.spacing(2) + 'px !important'
     }
 }));
 
@@ -116,6 +116,7 @@ export const Form = () => {
     const uploadsRef = useRef(
         zipObject(fileFields, fileFields.map(() => createRef()))
     ) as MutableRefObject<{ [key: string]: MutableRefObject<InputFileComponent> }>
+   
 
     useEffect(() => {
         [
@@ -158,12 +159,12 @@ export const Form = () => {
         sendData['cast_members_id'] = formData['cast_members'].map(cast_member => cast_member.id);
         sendData['categories_id'] = formData['categories'].map(category => category.id);
         sendData['genres_id'] = formData['genres'].map(genre => genre.id);
-        
+
         setLoading(true);
         try {
             const http = !video
                 ? videoHttp.create(sendData)
-                : videoHttp.update(video.id, {...sendData, _method: 'PUT'}, { http: { usePost: true } });
+                : videoHttp.update(video.id, { ...sendData, _method: 'PUT' }, { http: { usePost: true } });
             const { data } = await http;
             snackbar.enqueueSnackbar(
                 'Video salvo com sucesso!', {
@@ -374,7 +375,7 @@ export const Form = () => {
                                 label={
                                     <Typography color="primary" variant={"subtitle2"}>
                                         Quero que este conteudo apareca na secao lancamentos
-                            </Typography>
+                                    </Typography>
                                 }
                                 labelPlacement={'end'}
                             />

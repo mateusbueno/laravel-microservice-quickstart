@@ -11,6 +11,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from '../../util/vendor/yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { useSnackbar } from 'notistack';
 import { useHistory, useParams } from 'react-router';
 import { IUserRouteParams } from '../../util/models/interfaces';
