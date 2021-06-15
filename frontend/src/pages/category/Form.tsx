@@ -1,6 +1,6 @@
 // @flow 
 import { Checkbox, FormControlLabel, TextField } from '@material-ui/core';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import categoryHttp from '../../util/http/category-http';
 import * as yup from '../../util/vendor/yup';
@@ -11,6 +11,7 @@ import { useSnackbar } from 'notistack';
 import { Category } from '../../util/models';
 import SubmitActions from '../../components/SubmitActions';
 import DefaultForm from '../../components/DafaultForm';
+import LoadingContext from '../../components/loading/LoadingContext';
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -41,14 +42,13 @@ export const Form = () => {
     const history = useHistory();
     const { id } = useParams<IUserRouteParams>();
     const [category, setCategory] = useState<Category | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const loading = useContext(LoadingContext);
 
     useEffect(() => {
         if (!id) {
             return;
         }
         (async function getCategory() {
-            setLoading(true);
             try {
                 const { data } = await categoryHttp.get(id);
                 setCategory(data.data);
@@ -59,8 +59,6 @@ export const Form = () => {
                     'Nao foi possivel carregar as informacoes!', {
                     variant: 'error'
                 });
-            } finally {
-                setLoading(false);
             }
         })()
 
@@ -72,7 +70,6 @@ export const Form = () => {
     }, [register]);
 
     async function onSubmit(formData, event) {
-        setLoading(true);
         try {
             const http = !category
                 ? categoryHttp.create(formData)
@@ -96,8 +93,6 @@ export const Form = () => {
                 'Nao foi possivel salvar a categoria!', {
                 variant: 'error'
             });
-        } finally {
-            setLoading(false);
         }
     }
 

@@ -91,9 +91,8 @@ const Table = () => {
     const snackbar = useSnackbar();
     const subscribed = useRef(true);
     const [data, setData] = useState<Category[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const loading = useContext(LoadingContext);
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
-    const textLoaging = useContext(LoadingContext);
 
     const {
         columns,
@@ -130,7 +129,6 @@ const Table = () => {
     ]);
 
     async function getData() {
-        setLoading(true);
         try {
             const { data } = await categoryHttp.list<ListResponse<Category>>({
                 queryParams: {
@@ -154,14 +152,11 @@ const Table = () => {
                 'Nao foi possivel carregar as informacoes',
                 { variant: 'error' }
             )
-        } finally {
-            setLoading(false);
         }
     }
 
     return (
         <MuiThemeProvider theme={makeActionStyle(columnsDefinition.length - 1)}>
-            {textLoaging ? 'true': 'false'}
             <DefaultTable
                 title="Listagem de categorias"
                 columns={columns}

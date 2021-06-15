@@ -19,6 +19,7 @@ import CastMemberField from './CastMemberField';
 import { omit, zipObject } from 'lodash';
 import { InputFileComponent } from '../../../components/InputFile';
 import useSnackbarFormError from '../../../hooks/useSnackbarFormError';
+import SnackbarUpload from '../../../components/Snackbar/Upload';
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -130,6 +131,17 @@ export const Form = () => {
     }, [register]);
 
     useEffect(() => {
+        snackbar.enqueueSnackbar('', {
+            key: 'snackbar-upload',
+            persist: true,
+            anchorOrigin: {
+                vertical: 'bottom',
+                horizontal: 'right'
+            },
+            content: (key: string | number, message) => (
+                <SnackbarUpload id={key}/>
+            )
+        });
         if (!id) {
             return;
         }

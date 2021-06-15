@@ -1,37 +1,56 @@
 // @flow 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import LoadingContext from './LoadingContext';
-import axios from 'axios';
+import { addGlobalRequestInterceptor, addGlobalResponseInterceptor, removeGlobalRequestInterceptor, removeGlobalResponseInterceptor } from '../../util/http';
 
 const LoadingProvider = ({ children }) => {
     const [loading, setLoading] = useState<boolean>(false);
+    const [countRequest, setCountRequest] = useState(0);
 
-    useEffect(() => {
+    useMemo(() => {
+        console.log(countRequest)
         let isSubscribed = true;
-        axios.interceptors.request.use((config) => {
+        const requestIds = addGlobalRequestInterceptor((config) => {
             if (isSubscribed) {
                 setLoading(true);
+                setCountRequest((prevCountRequest) => prevCountRequest + 1);
             };
             return config;
         });
-        axios.interceptors.response.use(
+        //axios.interceptors.request.use();
+        const responseIds = addGlobalResponseInterceptor(
             (response) => {
                 if (isSubscribed) {
-                    setLoading(false);
+                    decrementCountRequest();
                 };
                 return response;
             },
             (error) => {
                 if (isSubscribed) {
-                    setLoading(false);
+                    decrementCountRequest();
                 };
                 return Promise.reject(error);
             }
         );
+        //axios.interceptors.response.use();
         return () => {
             isSubscribed = false;
+            removeGlobalRequestInterceptor(requestIds);
+            removeGlobalResponseInterceptor(responseIds);
         }
-    }, [])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [true]);
+
+    useEffect(() => {
+        if (!countRequest) {
+            setLoading(false);
+        }
+    }, [countRequest])
+
+    function decrementCountRequest() {
+        setCountRequest((prevCountRequest) => prevCountRequest - 1);
+    };
+
 
     return (
         <LoadingContext.Provider value={loading}>
