@@ -20,8 +20,9 @@ import { omit, zipObject } from 'lodash';
 import { InputFileComponent } from '../../../components/InputFile';
 import useSnackbarFormError from '../../../hooks/useSnackbarFormError';
 import SnackbarUpload from '../../../components/Snackbar/Upload';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { State as UploadState, Upload } from '../../../store/upload/types';
+import { Creators } from '../../../store/upload';
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -121,6 +122,23 @@ export const Form = () => {
     ) as MutableRefObject<{ [key: string]: MutableRefObject<InputFileComponent> }>
    
     const uploads = useSelector<UploadState, Upload[]>((state) => state.uploads);
+
+    const dispatch = useDispatch();
+
+    setTimeout(() => {
+
+        const obj: any = {
+            video: {
+                id: '1',
+                title: ' e o vento levou'
+            },
+            files: [
+                {file: new File([''], 'teste.mp4')}
+            ]
+        }
+        dispatch(Creators.addUpload(obj));
+        dispatch(Creators.addUpload(obj));
+    }, 1000)
 
     console.log(uploads);
 
