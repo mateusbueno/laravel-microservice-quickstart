@@ -20,6 +20,8 @@ import { omit, zipObject } from 'lodash';
 import { InputFileComponent } from '../../../components/InputFile';
 import useSnackbarFormError from '../../../hooks/useSnackbarFormError';
 import SnackbarUpload from '../../../components/Snackbar/Upload';
+import { useSelector } from 'react-redux';
+import { State as UploadState, Upload } from '../../../store/upload/types';
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -118,6 +120,9 @@ export const Form = () => {
         zipObject(fileFields, fileFields.map(() => createRef()))
     ) as MutableRefObject<{ [key: string]: MutableRefObject<InputFileComponent> }>
    
+    const uploads = useSelector<UploadState, Upload[]>((state) => state.uploads);
+
+    console.log(uploads);
 
     useEffect(() => {
         [

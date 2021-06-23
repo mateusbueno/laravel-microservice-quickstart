@@ -8,6 +8,7 @@ import CastMemberForm from '../pages/cast-member/PageForm';
 import VideoForm from '../pages/video/PageForm';
 import VideoList from '../pages/video/PageList';
 import Dashboard from '../pages/Dashboard';
+import UploadPage from '../pages/uploads';
 
 
 export interface MyRouteProps extends RouteProps {
@@ -105,6 +106,13 @@ const routes: MyRouteProps[] = [
         label: 'Editar Videos',
         path: '/videos/:id/edit',
         component: VideoForm,
+        exact: true
+    },
+    {
+        name: 'uploads',
+        label: 'Uploads',
+        path: '/uploads',
+        component: UploadPage,
         exact: true
     }, 
 ]
