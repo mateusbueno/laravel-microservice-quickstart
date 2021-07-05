@@ -1,6 +1,6 @@
 // @flow 
 import { Card, CardContent, Checkbox, FormControlLabel, FormHelperText, Grid, makeStyles, TextField, Theme, Typography, useMediaQuery, useTheme } from '@material-ui/core';
-import React, { createRef, MutableRefObject, useEffect, useRef, useState } from 'react';
+import React, { createRef, MutableRefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from '../../../util/vendor/yup';
@@ -19,9 +19,9 @@ import CastMemberField from './CastMemberField';
 import { omit, zipObject } from 'lodash';
 import { InputFileComponent } from '../../../components/InputFile';
 import useSnackbarFormError from '../../../hooks/useSnackbarFormError';
-import SnackbarUpload from '../../../components/Snackbar/Upload';
+import SnackbarUpload from '../../../components/SnackbarUpload';
 import { useDispatch, useSelector } from 'react-redux';
-import { State as UploadState, Upload } from '../../../store/upload/types';
+import { Upload, UploadModule } from '../../../store/upload/types';
 import { Creators } from '../../../store/upload';
 
 const validationSchema = yup.object().shape({
@@ -121,25 +121,45 @@ export const Form = () => {
         zipObject(fileFields, fileFields.map(() => createRef()))
     ) as MutableRefObject<{ [key: string]: MutableRefObject<InputFileComponent> }>
    
-    const uploads = useSelector<UploadState, Upload[]>((state) => state.uploads);
+    const uploads = useSelector<UploadModule, Upload[]>((state) => state.upload.uploads);
 
     const dispatch = useDispatch();
 
-    setTimeout(() => {
-
-        const obj: any = {
-            video: {
-                id: '1',
-                title: ' e o vento levou'
-            },
-            files: [
-                {file: new File([''], 'teste.mp4')}
-            ]
-        }
-        dispatch(Creators.addUpload(obj));
-        dispatch(Creators.addUpload(obj));
-    }, 1000)
-
+    useMemo (() => {
+        setTimeout(() => {
+            const obj: any = {
+                video: {
+                    id: '1',
+                    title: ' e o vento levou'
+                },
+                files: [
+                    {
+                        file: new File([''], 'teste1.mp4'),
+                        fileFields: 'trailer_file'
+                    },
+                    {
+                        file: new File([''], 'teste2.mp4'),
+                        fileFields: 'video_file'
+                    }
+                ]
+            }
+            dispatch(Creators.addUpload(obj));
+            const progress1 = {
+                fileField: 'trailer_file',
+                progress: 10,
+                video: {id: '1'}
+            } as any;
+            dispatch(Creators.updateProgress(progress1));
+            const progress2 = {
+                fileField: 'video_file',
+                progress: 20,
+                video: {id: '2'}
+            } as any;
+            dispatch(Creators.updateProgress(progress2));
+        }, 1000)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [true]);
+    
     console.log(uploads);
 
     useEffect(() => {

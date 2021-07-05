@@ -5,6 +5,7 @@ import ImageIcon from '@material-ui/icons/Image';
 import { Grid, ListItem, makeStyles, Theme, Typography } from '@material-ui/core';
 import UploadProgress from '../../components/UploadProgress';
 import UploadAction from './UploadAction';
+import { FileUpload, Upload } from '../../store/upload/types';
 
 const useStyles = makeStyles((theme: Theme) => ({
     gridTitle: {
@@ -18,10 +19,11 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface UploadItemProps {
-    
+    uploadOrFile: Upload | FileUpload;
 };
 export const UploadItem: React.FC<UploadItemProps> = (props) => {
     const classes = useStyles();
+    const {uploadOrFile} = props;
 
     function makeIcon() {
         if (true) {
@@ -51,8 +53,8 @@ export const UploadItem: React.FC<UploadItemProps> = (props) => {
                         alignItems={'center'}
                         justify={'flex-end'}
                     >
-                        <UploadProgress size={48}/>
-                        <UploadAction/>
+                        <UploadProgress size={48} uploadOrFile={uploadOrFile}/>
+                        <UploadAction uploadOrFile={uploadOrFile}/>
                     </Grid>
                 </Grid>
             </Grid>
