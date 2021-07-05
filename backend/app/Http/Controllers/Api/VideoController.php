@@ -54,7 +54,10 @@ class VideoController extends BaseController
     {
         $obj = $this->findOrFail($id);
         $this->addRuleIfGenreHasCategories($request);
-        $validatedData = $this->validate($request, $this->rulesUpdate());
+        $validatedData = $this->validate(
+            $request,
+            $request->isMethod('PUT') ? $this->rulesUpdate() : $this->rulesPatch()
+        );
         $obj->update($validatedData);
         $resource = $this->resource();
         return new $resource($obj);
@@ -67,6 +70,21 @@ class VideoController extends BaseController
         $this->rules['genres_id'][] = new GenresHasCategoriesRule(
             $categoriesId
         );
+    }
+
+    protected function rulesPatch()
+    {
+        return array_map(function($rules) {
+            if(is_array($rules)) {
+                $exists = in_array("required", $rules);
+                if ($exists) {
+                    array_unshift($rules,"sometimes");
+                }
+            } else {
+                return str_replace("required", "sometimes|required", $rules);
+            }
+            return $rules;
+        }, $this->rulesUpdate());
     }
 
     protected function model()
