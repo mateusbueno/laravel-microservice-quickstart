@@ -1,5 +1,5 @@
 // @flow 
-import React, {RefAttributes, useImperativeHandle, useRef, MutableRefObject} from 'react';
+import React, {RefAttributes, useImperativeHandle, useRef, MutableRefObject, useCallback} from 'react';
 import { FormControl, FormControlProps, FormHelperText, Typography } from '@material-ui/core';
 import AsyncAutocomplete, { AsyncAutocompleteComponent } from '../../../components/AsyncAutocomplete';
 import GridSelected from '../../../components/GridSelected';
@@ -26,16 +26,16 @@ const CastMemberField = React.forwardRef<CastMemberFieldComponent, CastMemberFie
     const { addItem, removeItem } = useCollectionManager(castMembers, setCastMembers);
     const autocompleteRef = useRef() as MutableRefObject<AsyncAutocompleteComponent>;
 
-    const fetchOptions = (searchText) => autocompleteHttp(
-        castMemberHttp.list({
-            queryParams: {
-                search: searchText,
-                all: ''
-            },
-        })
-    )
-        .then((data) => data.data)
-        .catch((error) => console.log(error));
+    const fetchOptions = useCallback((searchText) => {
+        return autocompleteHttp(
+            castMemberHttp
+                .list({
+                    queryParams: {
+                        search: searchText, all: ""
+                    }
+                })
+        ).then(data => data.data)
+    }, [autocompleteHttp])
 
     useImperativeHandle(ref, () => ({
         clear: () => autocompleteRef.current.clear()

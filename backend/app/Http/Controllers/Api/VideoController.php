@@ -112,8 +112,15 @@ class VideoController extends BaseController
         return $this->resource();
     }
 
-    // protected function queryBuilder(): Builder
-    // {
-    //     return parent::queryBuilder()->with(['genres.categories']);
-    // }
+    protected function queryBuilder(): Builder
+    {
+        $action = \Route::getCurrentRoute()->getAction()['uses'];
+        return parent::queryBuilder()->with([
+            strpos($action, 'index') !== false
+                ? 'genres'
+                : 'genres.categories',
+            'categories',
+            'castMembers'
+        ]);
+    }
 }

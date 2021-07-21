@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // @flow 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IconButton, MuiThemeProvider } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
@@ -80,7 +80,7 @@ const columnsDefinition: TableColumn[] = [
                             component={Link}
                             to={`/cast-members/${tableMeta.rowData[0]}/edit`}
                         >
-                            <EditIcon/>
+                            <EditIcon />
                         </IconButton>
                     </span>
                 )
@@ -96,15 +96,44 @@ const rowsPerPageOptions = [15, 25, 50];
 
 const Table = () => {
 
-    const snackbar = useSnackbar();
+    const {enqueueSnackbar} = useSnackbar();
     const subscribed = useRef(true);
     const [data, setData] = useState<CastMember[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
 
+    const extraFilter = useMemo(() => ({
+        createValidationSchema: () => {
+            return yup.object().shape({
+                type: yup.string()
+                    .nullable()
+                    .transform(value => {
+                        return !value || !castMemberNames.includes(value) ? undefined : value
+                    })
+                    .default(null)
+
+            })
+        },
+        formatSearchParams: (debouncedState) => {
+            return debouncedState.extraFilter ? {
+                ...(
+                    debouncedState.extraFilter.type &&
+                    { type: debouncedState.extraFilter.type }
+                )
+            } : undefined
+        },
+        getStateFromURL: (queryParams: URLSearchParams) => {
+            return {
+                type: queryParams.get('type')
+            }
+        }
+    }
+    ), []);
+
     const {
         columns,
         filterManager,
+        cleanSearchText,
         filterState,
         debouncedFilterState,
         totalRecords,
@@ -115,33 +144,10 @@ const Table = () => {
         rowsPerPage,
         rowsPerPageOptions,
         tableRef,
-        extraFilter: {
-            createValidationSchema: () => {
-                return yup.object().shape({
-                    type: yup.string()
-                        .nullable()
-                        .transform( value => {
-                            return !value || !castMemberNames.includes(value) ? undefined : value
-                        })
-                        .default(null)
-
-                })
-            },
-            formatSearchParams: (debouncedState) => {
-                return debouncedState.extraFilter ? {
-                    ...(
-                        debouncedState.extraFilter.type &&
-                        {type: debouncedState.extraFilter.type}
-                    )
-                } : undefined
-            },
-            getStateFromURL: (queryParams: URLSearchParams) => {
-                return {
-                    type: queryParams.get('type')
-                }
-            }
-        }
+        extraFilter
     });
+
+    const searchText = cleanSearchText(filterState.search);
 
     //?type=Diretor
     const indexColumnType = columns.findIndex(c => c.name === 'type');
@@ -154,40 +160,19 @@ const Table = () => {
         serverSideFilterList[indexColumnType] = [typeFilterValue];
     }
 
-    useEffect(() => {
-        filterManager.replaceHistory();
-    }, []);
-
-    useEffect(() => {
-        subscribed.current = true;
-        filterManager.pushHistory();
-        getData();
-        return () => {
-            subscribed.current = false;
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        filterManager.cleanSearchText(debouncedFilterState.search),
-        debouncedFilterState.pagination.page,
-        debouncedFilterState.pagination.per_page,
-        debouncedFilterState.order,
-        JSON.stringify(debouncedFilterState.extraFilter)
-    ]);
-
-    async function getData() {
+    const getData = useCallback(async ({ search, page, per_page, sort, dir, type }) => {
         setLoading(true);
         try {
             const { data } = await castMemberHttp.list<ListResponse<CastMember>>({
                 queryParams: {
-                    search: filterManager.cleanSearchText(filterState.search),
-                    page: filterState.pagination.page,
-                    per_page: filterState.pagination.per_page,
-                    sort: filterState.order.sort,
-                    dir: filterState.order.dir,
+                    search,
+                    page,
+                    per_page,
+                    sort,
+                    dir,
                     ...(
-                        debouncedFilterState.extraFilter &&
-                        debouncedFilterState.extraFilter.type &&
-                        {type: invert(CastMemberTypeMap)[debouncedFilterState.extraFilter.type]}
+                        type &&
+                        { type: invert(CastMemberTypeMap)[type] }
                     )
                 }
             });
@@ -200,18 +185,47 @@ const Table = () => {
             if (castMemberHttp.isCancelledRequest(error)) {
                 return;
             }
-            snackbar.enqueueSnackbar(
-                'Nao foi possivel carregar as informacoes',
+            enqueueSnackbar(
+                'Nao foi possível carregar as informações',
                 { variant: 'error' }
             )
         } finally {
             setLoading(false);
         }
-    }
+    }, [enqueueSnackbar, setTotalRecords]);
+
+    useEffect(() => {
+        subscribed.current = true;
+        getData({
+            search: searchText,
+            page: filterState.pagination.page,
+            per_page: filterState.pagination.per_page,
+            sort: filterState.order.sort,
+            dir: filterState.order.dir,
+            ...(
+                debouncedFilterState.extraFilter &&
+                debouncedFilterState.extraFilter.type &&
+                {
+                    type: debouncedFilterState.extraFilter.type
+                }
+            )
+        });
+
+        return () => {
+            subscribed.current = false;
+        }
+    }, [
+        getData,
+        searchText,
+        debouncedFilterState.pagination.page,
+        debouncedFilterState.pagination.per_page,
+        debouncedFilterState.order,
+        debouncedFilterState.extraFilter
+    ]);
 
     return (
-        <MuiThemeProvider theme={makeActionStyle(columnsDefinition.length-1)}>
-            <DefaultTable 
+        <MuiThemeProvider theme={makeActionStyle(columnsDefinition.length - 1)}>
+            <DefaultTable
                 title="Listagem de membros de elenco"
                 columns={columnsDefinition}
                 data={data}

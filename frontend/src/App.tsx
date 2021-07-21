@@ -18,7 +18,7 @@ function App() {
         <MuiThemeProvider theme={theme}>
           <SnackBarProvider>
           <CssBaseline/>
-          <BrowserRouter>
+          <BrowserRouter basename="/admin">
             <Spinner />
             <Navbar />
             <Box paddingTop={'70px'}>

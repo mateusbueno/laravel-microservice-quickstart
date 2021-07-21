@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // @flow 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 
 import format from 'date-fns/format';
 import parseISO from 'date-fns/parseISO';
@@ -15,6 +15,7 @@ import useFilter from '../../hooks/useFilter';
 import videoHttp from '../../util/http/video-http';
 import { DeleteDialog } from '../../components/DeleteDialog';
 import useDeleteCollection from '../../hooks/useDeleteCollection';
+import LoadingContext from '../../components/loading/LoadingContext';
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -101,13 +102,14 @@ const Table = () => {
     const snackbar = useSnackbar();
     const subscribed = useRef(true);
     const [data, setData] = useState<Video[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const loading = useContext(LoadingContext);
     const {openDeleteDialog, setOpenDeleteDialog, rowsToDelete, setRowsToDelete} = useDeleteCollection();
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
 
     const {
         columns,
         filterManager,
+        cleanSearchText,
         filterState,
         debouncedFilterState,
         totalRecords,
@@ -121,30 +123,23 @@ const Table = () => {
     });
 
     useEffect(() => {
-        filterManager.replaceHistory();
-    }, []);
-
-    useEffect(() => {
         subscribed.current = true;
-        filterManager.pushHistory();
         getData();
         return () => {
             subscribed.current = false;
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        filterManager.cleanSearchText(debouncedFilterState.search),
+        cleanSearchText(debouncedFilterState.search),
         debouncedFilterState.pagination.page,
         debouncedFilterState.pagination.per_page,
         debouncedFilterState.order,
     ]);
 
     async function getData() {
-        setLoading(true);
         try {
             const { data } = await videoHttp.list<ListResponse<Video>>({
                 queryParams: {
-                    search: filterManager.cleanSearchText(filterState.search),
+                    search: cleanSearchText(filterState.search),
                     page: filterState.pagination.page,
                     per_page: filterState.pagination.per_page,
                     sort: filterState.order.sort,
@@ -164,11 +159,9 @@ const Table = () => {
                 return;
             }
             snackbar.enqueueSnackbar(
-                'Nao foi possivel carregar as informacoes',
+                'Nao foi possível carregar as informações',
                 { variant: 'error' }
             )
-        } finally {
-            setLoading(false);
         }
     };
 

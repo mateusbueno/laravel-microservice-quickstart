@@ -72,6 +72,9 @@ const CategoryField = React.forwardRef<CategoryFieldComponent, CategoryFieldProp
                     error: error !== undefined
                 }}
             />
+            <FormHelperText style={{height: '24px'}}>
+                Escolha pelo menos uma categoria de cada género
+            </FormHelperText>
             <FormControl
                 margin={'normal'}
                 fullWidth

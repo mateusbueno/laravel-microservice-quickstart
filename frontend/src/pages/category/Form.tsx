@@ -31,7 +31,7 @@ export const Form = () => {
         reset,
         watch,
         trigger
-    } = useForm({
+    } = useForm<{name, is_active}>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
             is_active: true

@@ -26,6 +26,7 @@ class CastMember extends Model
         'type' => 'integer'
     ];
     public $incrementing = false;
+    protected $keyType = 'string';
 
     public function modelFilter()
     {

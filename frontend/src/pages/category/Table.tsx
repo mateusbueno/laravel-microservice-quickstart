@@ -97,6 +97,7 @@ const Table = () => {
     const {
         columns,
         filterManager,
+        cleanSearchText,
         filterState,
         debouncedFilterState,
         totalRecords,
@@ -110,19 +111,14 @@ const Table = () => {
     });
 
     useEffect(() => {
-        filterManager.replaceHistory();
-    }, []);
-
-    useEffect(() => {
         subscribed.current = true;
-        filterManager.pushHistory();
         getData();
         return () => {
             subscribed.current = false;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        filterManager.cleanSearchText(debouncedFilterState.search),
+        cleanSearchText(debouncedFilterState.search),
         debouncedFilterState.pagination.page,
         debouncedFilterState.pagination.per_page,
         debouncedFilterState.order,
@@ -132,7 +128,7 @@ const Table = () => {
         try {
             const { data } = await categoryHttp.list<ListResponse<Category>>({
                 queryParams: {
-                    search: filterManager.cleanSearchText(filterState.search),
+                    search: cleanSearchText(filterState.search),
                     page: filterState.pagination.page,
                     per_page: filterState.pagination.per_page,
                     sort: filterState.order.sort,

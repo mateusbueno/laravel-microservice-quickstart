@@ -26,7 +26,7 @@ const SubmitActions: React.FC<SubmitActionsProps> = (props) => {
     }
     
     return (
-        <Box>
+        <Box dir={'ltf'}>
             <Button {...buttonProps} onClick={props.handleSave}>Salvar</Button>
             <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
         </Box>

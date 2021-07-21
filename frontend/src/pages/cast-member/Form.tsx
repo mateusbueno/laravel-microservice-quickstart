@@ -40,7 +40,7 @@ export const Form = () => {
         reset,
         watch,
         trigger
-    } = useForm({
+    } = useForm<{name, type}>({
         resolver: yupResolver(validationSchema),
     });
 

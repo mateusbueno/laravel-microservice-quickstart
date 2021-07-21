@@ -34,7 +34,7 @@ export const Form = () => {
         reset,
         watch,
         trigger
-    } = useForm({
+    } = useForm<{name, categories_id}>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
             categories_id: [],
@@ -42,7 +42,7 @@ export const Form = () => {
         }
     });
 
-    const snackbar = useSnackbar();
+    const {enqueueSnackbar} = useSnackbar();
     const history = useHistory();
     const { id } = useParams<IUserRouteParams>();
     const [genre, setGenre] = useState<Genre | null>(null);
@@ -72,16 +72,15 @@ export const Form = () => {
                 }
             } catch (error) {
                 console.error(error);
-                snackbar.enqueueSnackbar(
-                    'Nao foi possivel carregar as informacoes',
+                enqueueSnackbar(
+                    'Nao foi possível carregar as informações',
                     { variant: 'error' }
                 )
             } finally {
                 setLoading(false);
             }
         })();
-        // eslint-disable-next-line
-    }, []);
+    }, [id, reset, enqueueSnackbar]);
 
     async function onSubmit(formData, event) {
 
@@ -91,7 +90,7 @@ export const Form = () => {
                 ? genreHttp.create(formData)
                 : genreHttp.update(genre.id, formData);
             const { data } = await http;
-            snackbar.enqueueSnackbar(
+            enqueueSnackbar(
                 'Genero salvo com sucesso',
                 { variant: 'success' }
             );
@@ -106,7 +105,7 @@ export const Form = () => {
             })
         } catch (error) {
             console.error(error);
-            snackbar.enqueueSnackbar(
+            enqueueSnackbar(
                 'Nao foi possivel salvar o genero',
                 { variant: 'error' }
             )

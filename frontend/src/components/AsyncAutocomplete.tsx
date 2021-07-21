@@ -18,7 +18,7 @@ export interface AsyncAutocompleteComponent {
 }
 const AsyncAutocomplete = React.forwardRef<AsyncAutocompleteComponent, AsyncAutocompleteProps> ((props, ref) => {
 
-    const {AutoCompleteProps, debounceTime = 300} = props;
+    const {AutoCompleteProps, debounceTime = 300, fetchOptions} = props;
     const {onOpen, onClose, onInputChange, freeSolo} = AutoCompleteProps as any;
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -78,18 +78,20 @@ const AsyncAutocomplete = React.forwardRef<AsyncAutocompleteComponent, AsyncAuto
         if (!open && !freeSolo) {
             setOptions([]);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[open])
+    },[open, freeSolo])
 
     useEffect(() => {
-        if (!open || debouncedSearchText === "" && freeSolo) {
+        if (!open) {
+            return;
+        }
+        if (debouncedSearchText === "" && freeSolo) {
             return;
         }
         let isSubscribed = true;
         (async () => {
             setLoading(true);
             try {
-                const data = await props.fetchOptions(debouncedSearchText);
+                const data = await fetchOptions(debouncedSearchText);
                 if (isSubscribed) {
                     setOptions(data);
                 }
@@ -97,8 +99,7 @@ const AsyncAutocomplete = React.forwardRef<AsyncAutocompleteComponent, AsyncAuto
                 setLoading(false);
             }
         })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [freeSolo ? debouncedSearchText : open]);
+    }, [freeSolo, debouncedSearchText, open, fetchOptions]);
 
     useImperativeHandle(ref, () => ({
         clear: () => {

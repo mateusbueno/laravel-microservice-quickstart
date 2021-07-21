@@ -1,20 +1,17 @@
+/* eslint-disable no-template-curly-in-string */
 import { addMethod, NumberSchema, number } from "yup";
 import { setLocale } from "yup";
 
 const ptBR = {
     mixed: {
-        // eslint-disable-next-line 
         required: '${path} e requerido',
-        // eslint-disable-next-line 
         notType: '${path} e invalido'
     },
     string: {
-        // eslint-disable-next-line 
-        max: '${path} precisa ter no maximo ${max}'
+        max: '${path} precisa ter no máximo ${max}'
     },
     number: {
-        // eslint-disable-next-line 
-        min: '${path} precisa ser no minimo ${min}'
+        min: '${path} precisa ser no mínimo ${min}'
     }
 }
 
