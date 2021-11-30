@@ -4,8 +4,10 @@ services:
 
     app:
         build: .
+        #image: mateusob/php-apache:7.4
         container_name: micro-videos-app
-        entrypoint: dockerize -template ./.docker/app/.env:.env -wait tcp://db:3306 -timeout 40s ./.docker/entrypoint.sh
+        entrypoint: dockerize -wait tcp://db:3306 -timeout 40s ./.docker/entrypoint.sh
+        #entrypoint: dockerize -template ./.docker/app/.env:.env -wait tcp://db:3306 -timeout 40s ./.docker/entrypoint.sh
         environment:
             - _DB_HOST=db
             - _DB_DATABASE=code_micro_videos
@@ -13,6 +15,10 @@ services:
             - _DB_PASSWORD=root
         volumes:
             - .:/var/www
+        env_file:
+            - .env
+        #volumes:
+        #    - .:/var/www/html/app
         networks:
             - app-network
         depends_on:
