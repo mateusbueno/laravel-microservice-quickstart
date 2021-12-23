@@ -24,4 +24,5 @@ Route::group(['namespace' => 'Api'], function () {
     Route::resource('categories', CategoryController::class, $exceptCreateAndEdit);
     Route::resource('genres', GenreController::class, $exceptCreateAndEdit);
     Route::resource('cast_members', CastMemberController::class, $exceptCreateAndEdit);
+    Route::resource('videos', VideoController::class, $exceptCreateAndEdit);
 });

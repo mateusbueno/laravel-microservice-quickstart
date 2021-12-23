@@ -3,15 +3,15 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Category;
-use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 use App\Models\Traits\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-# Classe específica               - vendor/bin/phpunit tests/Unit/CategoryTest.php
-# Método específico em um arquivo - vendor/bin/phpunit --filter testIfUseTraits tests/Unit/CategoryTest.php
-# Método específico em uma classe - vendor/bin/phpunit --filter CategoryTest::testIfUseTraits
+# Classe específica               - vendor/bin/phpunit tests/Unit/Models/CategoryUnitTest.php
+# Método específico em um arquivo - vendor/bin/phpunit --filter testIfUseTraits tests/Unit/Models/CategoryUnitTest.php
+# Método específico em uma classe - vendor/bin/phpunit --filter CategoryUnitTest::testIfUseTraits
 
-class CategoryTest extends TestCase
+class CategoryUnitTest extends TestCase
 {
     private $category;
 
