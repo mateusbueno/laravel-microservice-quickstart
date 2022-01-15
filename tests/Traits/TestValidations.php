@@ -19,7 +19,7 @@ trait TestValidations
     ) {
         $response = $this->json('POST', $this->routeStore(), $data);
         $fields = array_keys($data);
-        $this->assertInvalitationFields($response, $fields, $rule, $ruleParams);
+        $this->assertInvalidationFields($response, $fields, $rule, $ruleParams);
     }
 
     protected function assertInvalidationInUpdateAction(
@@ -29,10 +29,10 @@ trait TestValidations
     ) {
         $response = $this->json('PUT', $this->routeUpdate(), $data);
         $fields = array_keys($data);
-        $this->assertInvalitationFields($response, $fields, $rule, $ruleParams);
+        $this->assertInvalidationFields($response, $fields, $rule, $ruleParams);
     }
 
-    protected function assertInvalitationFields(
+    protected function assertInvalidationFields(
         TestResponse $response,
         array $fields,
         string $rule,
