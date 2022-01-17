@@ -1,6 +1,6 @@
 FROM php:7.4-fpm-alpine3.15
 
-RUN apk add --no-cache shadow openssl bash mysql-client nodejs npm git
+RUN apk add --no-cache shadow openssl bash mysql-client nodejs-current npm git
 RUN docker-php-ext-install pdo pdo_mysql
 
 RUN touch /home/www-data/.bashrc | echo "PS1='\w\$ '" >> /home/www-data/.bashrc
