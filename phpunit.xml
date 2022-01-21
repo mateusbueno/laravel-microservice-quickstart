@@ -21,6 +21,9 @@
         <testsuite name="Feature">
             <directory suffix="Test.php">./tests/Feature</directory>
         </testsuite>
+        <testsuite name="Prod">
+            <directory suffix="Test.php">./tests/Prod</directory>
+        </testsuite>
     </testsuites>
     <extensions>
         <extension class="Tests\Bootstrap"/>
