@@ -35,4 +35,13 @@ trait TestUploads
             $this->assertInvalidationFields($response, [$field], 'max.file', ['max' => $maxSize]);
         }
     }
+
+    protected function assertFilesExistInStorage($model, array $files)
+    {
+        /** @var UploadFiles $model*/
+        foreach ($files as $file) {
+            $path = $model->relativeFilePath($file->hashName());
+            \Storage::assertExists($path);
+        }
+    }
 }

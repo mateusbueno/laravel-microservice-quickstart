@@ -88,4 +88,55 @@ class VideoUploadTest extends BaseVideoTestCase
 
         $this->assertTrue($hasError);
     }
+
+    public function testFileUrlsWithLocalDriver()
+    {
+        \Config::set("filesystems.default", 'video_local');
+        $fileFields = [];
+        $files = $this->getFiles();
+        foreach (Video::$fileFields as $field) {
+            $fileFields[$field] = $files[$field]->hashName();
+        }
+        $video = factory(Video::class)->create($fileFields + $files);
+        $baseUrl = config("filesystems.disks.video_local")["url"];
+        foreach ($fileFields as $field => $value) {
+            $fileUrl = $video->{"{$field}_url"};
+            $this->assertEquals("{$baseUrl}/$video->id/$value", $fileUrl);
+        }
+    }
+
+    public function testFileUrlsWithGcsDriver()
+    {
+        \Config::set("filesystems.default", 'gcs');
+        $fileFields = [];
+        $files = $this->getFiles();
+        foreach (Video::$fileFields as $field) {
+            $fileFields[$field] = $files[$field]->hashName();
+        }
+        $video = factory(Video::class)->create($fileFields + $files);
+        $baseUrl = config("filesystems.disks.gcs.storage_api_uri");
+        foreach ($fileFields as $field => $value) {
+            $fileUrl = $video->{"{$field}_url"};
+            $this->assertEquals("{$baseUrl}/$video->id/$value", $fileUrl);
+        }
+    }
+
+    public function testFileUrlsIfNullWhenFieldsAreNull()
+    {
+        $video = factory(Video::class)->create();
+        foreach (Video::$fileFields as $field) {
+            $fileUrl = $video->{"{$field}_url"};
+            $this->assertNull($fileUrl);
+        }
+    }
+
+    private function getFiles()
+    {
+        return [
+            'thumb_file' => UploadedFile::fake()->image('thumb.png'),
+            'video_file' => UploadedFile::fake()->image('video.mp4'),
+            'banner_file' => UploadedFile::fake()->image('banner_file.png'),
+            'trailer_file' => UploadedFile::fake()->image('trailer_file.mp4'),
+        ];
+    }
 }
