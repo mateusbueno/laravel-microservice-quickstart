@@ -1,10 +1,7 @@
 <?php
 
-//namespace Database\Seeders;
 use Illuminate\Database\Seeder;
-use App\Models\Category;
-use App\Models\Genre;
-use App\Models\Video;
+use App\Models\{CastMember,Category,Genre,Video};
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,7 +18,7 @@ class DatabaseSeeder extends Seeder
         //$this->call(CastMembersTableSeeder::class);
         $this->call(VideosTableSeeder::class);
         //factory(\App\Models\Genre::class, 100)->create();
-        factory(\App\Models\CastMember::class, 100)->create();
+        factory(CastMember::class, 100)->create();
         //factory(\App\Models\Video::class, 100)->create();
     }
 }

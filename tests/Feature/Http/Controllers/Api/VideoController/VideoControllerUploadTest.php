@@ -67,8 +67,8 @@ class VideoControllerUploadTest extends BaseVideoControllerTestCase
 
         $response->assertStatus(201);
         $this->assertFilesOnPersist($response, $files);
-        $video = Video::find($response->json('id'));
-        $this->assertIfFilesUrlExists($video);
+        $video = Video::find($response->json('data.id'));
+        $this->assertIfFilesUrlExists($video, $response);
     }
 
     public function testUpdateWithFiles()
@@ -99,7 +99,7 @@ class VideoControllerUploadTest extends BaseVideoControllerTestCase
         $response->assertStatus(200);
         $this->assertFilesOnPersist($response, Arr::except($files, ['thumb_file', 'video_file']) + $newFiles);
 
-        $id = $response->json('id');
+        $id = $response->json('data.id');
         $video = Video::find($id);
         \Storage::assertMissing($video->relativeFilePath($files['thumb_file']->hashName()));
         \Storage::assertMissing($video->relativeFilePath($files['video_file']->hashName()));
@@ -113,22 +113,6 @@ class VideoControllerUploadTest extends BaseVideoControllerTestCase
             'thumb_file' => UploadedFile::fake()->create('thumb_file.png'),
             'trailer_file' => UploadedFile::fake()->create('trailer_file.mp4'),
         ];
-    }
-
-    protected function assertHasCategory($videoId, $categoryId)
-    {
-        $this->assertDatabaseHas('category_video', [
-            "category_id" => $categoryId,
-            "video_id" => $videoId
-        ]);
-    }
-
-    protected function assertHasGenre($videoId, $genreId)
-    {
-        $this->assertDatabaseHas('genre_video', [
-            "genre_id" => $genreId,
-            "video_id" => $videoId
-        ]);
     }
 
     protected function assertFilesOnPersist(TestResponse $response, $files)
